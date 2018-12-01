@@ -1,0 +1,23 @@
+[info]
+name = "Natsuka_Fuou"          
+displayname = "Natsuka Fuou"   ;風生夏香
+versiondate = 11,17,2017      ;最終更新日
+mugenversion = 12,27,2007          ;win版 mugen plus
+author = "Wani_Shimamura"          ;島村鰐
+Pal.Defaults = 4,5,6,1,2,3
+
+[Files]
+cmd = Natsuka_Fuou.cmd
+cns = Natsuka_Fuou.cns
+st  = Natsuka_Fuou.cns
+st1 = Natsuka_Fuou_-2_-3.cns
+stcommon = Natsuka_Fuou_common.cns
+sprite = Natsuka_Fuou.sff
+anim = Natsuka_Fuou.air
+sound = Natsuka_Fuou.snd
+pal1 = Natsuka_Fuou04.act
+pal2 = Natsuka_Fuou05.act
+pal3 = Natsuka_Fuou06.act
+pal4 = Natsuka_Fuou01.act
+pal5 = Natsuka_Fuou02.act
+pal6 = Natsuka_Fuou03.act

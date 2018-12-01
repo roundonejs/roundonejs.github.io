@@ -1,0 +1,8605 @@
+[Data]
+life = 980
+power = 3000
+attack = 100
+defence = 100
+fall.defence_up = 50
+liedown.time = 80
+airjuggle = 15
+sparkno = 2
+guard.sparkno = 40
+KO.echo = 0
+volume = 0
+IntPersistIndex = 40
+FloatPersistIndex = 30
+
+[Size]
+xscale = 0.5
+yscale = 0.5
+ground.back = 15
+ground.front = 15
+air.back = 5
+air.front = 5
+height = 50
+attack.dist = 160
+proj.attack.dist = 90
+proj.doscale = 1
+head.pos = 5, -80
+mid.pos = 0, -50
+shadowoffset = 0
+draw.offset = 0,0
+
+[Velocity]
+walk.fwd = 1.0
+walk.back = -0.68
+run.fwd = 6.2, 0
+run.back =-4, -4
+jump.neu = 0, -8.7
+jump.back = -3.2
+jump.fwd = 3.5
+runjump.fwd = 4.8
+
+[Movement]
+airjump.num = 0		;空中でジャンプする回数
+airjump.height = 28		;空中でジャンプする最低限の高さ
+yaccel = .47			;重力
+stand.friction = .85		;立ち状態の摩擦係数
+crouch.friction = .82	;屈み状態の摩擦係数
+
+[ja.Quotes]
+victory1 = "押忍！！"
+victory2 = "体が小さくても、凡才でも！頑張ることはできる！\nだから簡単には負けません！"
+victory3 = "ありがとうございました！また何時か何処かで闘いたいです。"
+victory4 = "まだ…まだなんだ。もっと強く、もっと速く、もっと高く……\n先へ……先へ！行ける所まで！！"
+victory5 = "正しさなんて知らないし、虚しくても構わない。\nそれでも…わたしはわたしになりたいんだ！"
+victory6 = "勝った……\nぬおおおー！くおおおー！\nうおおおおお！！だああああああああ！！！"
+victory7 = "乾坤一擲、勝ちました！"
+
+;-|演出関係|-----------------------------------------------------------------------------------------------------------
+
+;タイムオーバー敗北
+[statedef 170]
+type = S
+ctrl = 0
+velset = 0,0
+
+[state 170, 1]
+type = changeanim
+trigger1 = time = 0
+value = 170
+
+
+;勝利ポーズ
+[statedef 180]
+type = S
+
+[state 180, 勝利ポーズ１へ]
+type = changestate
+trigger1 = time = 0
+value = 181+random%2
+
+;勝利ポーズ1
+[statedef 181]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+velset = 0,0
+
+[state 181, 勝利ポーズ１]
+type = changeanim
+trigger1 = time = 0
+value = 181
+
+;勝利ポーズ2
+[statedef 182]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+velset = 0,0
+
+[state 182, 勝利ポーズ２]
+type = changeanim
+trigger1 = time = 0
+value = 182
+
+[state 182,SE]
+type = playsnd
+trigger1 = animelem = 1
+trigger2 = animelem = 3
+value = 3,0
+
+;登場アクション
+[statedef 191]
+type = S
+movetype = I
+physics = N
+ctrl = 0
+velset = 0,0
+
+[state 191, 登場アクションアニメ]
+type = changeanim
+trigger1 = roundstate = 0
+value = 191
+
+[state 191, 動作中はラウンド開始しない]
+type = assertspecial
+trigger1 = 1
+flag = intro
+
+[state 191, 動作終了]
+type = changestate
+trigger1 = anim = 191
+trigger1 = animtime = 0
+value = 0
+
+
+;挑発
+[statedef 195]
+type = S
+movetype = I
+physics = S
+velset = 0,0
+anim = 195
+ctrl = 0
+sprpriority = 2
+
+[state 195, SE]
+type = playsnd
+trigger1 = animelem = 5
+value = 5100,1
+
+[state 195, ゲージ増加]
+type = poweradd
+triggerall = var(40) = 1
+trigger1 = animtime = 0
+value = 200
+
+[state 195, 終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;-|特殊動作|----------------------------------------------------------------------------------------
+
+;攻撃避け
+[statedef 800]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 800
+poweradd = 0
+sprpriority = -2
+
+[state 800, 全身無敵]
+type = nothitby
+trigger1 = 1
+value = ,AA,AP
+
+[state 800, 接触判定消滅]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 800, ガード動作移行条件解除]
+type = attackdist
+trigger1 = time = 0
+value = 0
+
+[state 800, 残像]
+type = afterimage
+trigger1 = animelem = 1
+time = 28
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 128,128,128
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 800, 残像消去]
+type = afterimage
+trigger1 = animtime = 0
+time = 0
+
+[state 800, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;回り込み
+[statedef 850]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 850
+poweradd = 0
+sprpriority = -2
+
+[state 850, 全身無敵]
+type = nothitby
+trigger1 = time <= 21
+value = ,AA,AP
+
+[state 850, 接触判定消滅]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 850, ガード動作移行条件解除]
+type = attackdist
+trigger1 = time = 0
+value = 0
+
+[state 850, SE1]
+type = playsnd
+trigger1 = animelem = 1
+value = 40,0
+
+[state 850, 速度]
+type = velset
+trigger1 = animelem = 2
+x = 5.0
+
+[state 850, SE2]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,4
+
+[state 850, 残像]
+type = afterimage
+trigger1 = animelem = 1
+time = 28
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 128,128,128
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 850, 移動終了]
+type = velset
+trigger1 = animelem = 8
+x = 0
+
+[state 850, 残像消去]
+type = afterimage
+trigger1 = animtime = 0
+time = 0
+
+[state 850, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;パワー溜め動作
+[statedef 860]
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 860
+poweradd = 0
+sprpriority = 2
+
+[state 860, パワー蓄積]
+type = poweradd
+trigger1 = anim = 860
+trigger1 = 1
+value = 6+time/16
+
+[state 860, パワー溜め終了]
+type = changeanim
+trigger1 = command != "chargec" || command != "chargez"
+trigger2 = power >= 1000
+value = 861
+persistent = 0
+
+[state 860, 行動可能]
+type = ctrlset
+triggerall = ctrl = 0
+trigger1 = anim = 861
+value = 1
+
+[state 860, 動作終了]
+type = changestate
+trigger1 = anim = 861 && animtime = 0
+value = 0
+ctrl = 1
+
+
+;-|ガードキャンセル行動|----------------------------------------------------------------------------
+
+;ガードキャンセル回り込み
+[statedef 900]
+type = S
+movetype = A
+physics = N
+velset = 0,0
+ctrl = 0
+poweradd = 0
+sprpriority = 2
+
+[state 900, POW.MAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = time = 0
+var(20) = 0
+
+[state 900, ゲージ消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 900, 全身無敵]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 900, 時間停止]
+type = pause
+trigger1 = time = 0
+time = 13
+movetime = 13
+
+[state 900, 接触判定消滅]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 900, ガード動作移行条件解除]
+type = attackdist
+trigger1 = time = 0
+value = 0
+
+[state 900, フラッシュ]
+type = palfx
+trigger1 = time = 0
+time = 3
+add = 256,256,256
+
+[state 900, エフェクト]
+type = explod
+trigger1 = time = 0
+anim = 8120
+pos = 26,ifelse(statetype = C, -56, -83)
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 900, 回り込み動作に移行]
+type = changeanim
+trigger1 = time = 13
+value = 850
+
+[state 900, SE1]
+type = playsnd
+trigger1 = anim = 850
+trigger1 = animelem = 1
+value = 40,0
+
+[state 900, 速度]
+type = velset
+trigger1 = anim = 850
+trigger1 = animelem = 2
+x = 5.0
+
+[state 900, SE2]
+type = playsnd
+trigger1 = anim = 850
+trigger1 = animelem = 2
+value = 3,4
+
+[state 900, 描画優先度調整]
+type = sprpriority
+trigger1 = anim = 850
+trigger1 = animelem = 1
+value = -2
+
+[state 900, 残像]
+type = afterimage
+trigger1 = anim = 850
+trigger1 = animelem = 1
+time = 28
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 128,128,128
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 900, 移動終了]
+type = velset
+trigger1 = anim = 850
+trigger1 = animelem = 8
+x = 0
+
+[state 900, 残像消去]
+type = afterimage
+trigger1 = anim = 850
+trigger1 = animtime = 0
+time = 0
+
+[state 900, 動作終了]
+type = changestate
+trigger1 = anim = 850
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;ガードキャンセルバックステップ
+[statedef 910]
+type = A
+physics = N
+ctrl = 0
+velset = 0,0
+poweradd = 0
+sprpriority = 2
+
+[state 910, POW.MAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = time = 0
+var(20) = 0
+
+[state 910, ゲージ消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 910, 時間停止]
+type = pause
+trigger1 = time = 0
+time = 13
+movetime = 13
+
+[state 910, 無敵]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 910, フラッシュ]
+type = palfx
+trigger1 = time = 0
+time = 3
+add = 256,256,256
+
+[state 910, エフェクト]
+type = explod
+trigger1 = time = 0
+anim = 8120
+pos = 26,ifelse(statetype = C, -56, -83)
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 910, バックステップ動作へ移行]
+type = changeanim
+trigger1 = time = 13
+value = 105
+
+[state 910, SE]
+type = playsnd
+trigger1 = anim = 105
+trigger1 = animelem = 2
+value = 105, 0
+
+[state 910, 速度]
+type = velset
+trigger1 = anim = 105
+trigger1 = animelem = 2
+X = const(Velocity.run.back.x)
+y = const(Velocity.run.back.y)
+
+[state 910, 3]
+type = veladd
+trigger1 = anim = 105
+trigger1 = animelemtime(2) >= 0
+y = const(Movement.yaccel)
+
+[state 910, 4]
+type = changestate
+trigger1 = anim = 105
+trigger1 = animelemtime(3) >= 1
+trigger1 = Pos Y >= 0
+value = 911
+
+;ガードキャンセルバックステップ（着地）
+[statedef 911]
+type = S
+physics = S
+ctrl = 0
+anim = 106
+velset = 0,0
+
+[state 911, 無敵]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 911, 座標調整]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 911, SE]
+type = playsnd
+trigger1 = time = 0
+value = 52, 0
+
+[state 911, 1]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;ガードキャンセル攻撃1
+[statedef 920]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 920
+poweradd = 0
+sprpriority = 2
+
+[state 920, POW.MAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = time = 0
+var(20) = 0
+
+[state 920, ゲージ消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 920, 時間停止]
+type = pause
+trigger1 = time = 0
+time = 18
+movetime = 18
+
+[state 920, 無敵]
+type = nothitby
+trigger1 = animelemtime(5) < 0
+value = SCA,AA,AT,AP
+
+[state 920, フラッシュ]
+type = palfx
+trigger1 = time = 0
+time = 3
+add = 256,256,256
+
+[state 920, エフェクト]
+type = explod
+trigger1 = time = 0
+anim = 8120
+pos = 26,ifelse(statetype = C, -56, -83)
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 920, SE]
+type = playsnd
+trigger1 = animelem = 3
+value = 3,2
+
+[state 920, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(90 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-75
+hitsound = s2,2
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.2, -5.5
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 920, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(90*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 920, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 920, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(90*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 920, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 920, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[State 920, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;ガードキャンセル攻撃2
+[statedef 930]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 930
+poweradd = 0
+sprpriority = 2
+
+[state 930, POW.MAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = time = 0
+var(20) = 0
+
+[state 930, ゲージ消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 930, 時間停止]
+type = pause
+trigger1 = time = 0
+time = 18
+movetime = 18
+
+[state 930, 無敵]
+type = nothitby
+trigger1 = animelemtime(7) < 0
+value = SCA,AA,AT,AP
+
+[state 930, フラッシュ]
+type = palfx
+trigger1 = time = 0
+time = 3
+add = 256,256,256
+
+[state 930, エフェクト]
+type = explod
+trigger1 = time = 0
+anim = 8120
+pos = 26,ifelse(statetype = C, -56, -83)
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 930, SE1]
+type = playsnd
+trigger1 = animelem = 3
+value = 40,1
+
+[state 930, SE2]
+type = playsnd
+trigger1 = animelem = 5
+value = 3,5
+
+[state 930, エフェクト（バックファイア）]
+type = explod
+trigger1 = animelem = 3
+anim = 7030
+ID = 7030
+pos = 0,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 930, 空中判定へ移行]
+type = statetypeset
+trigger1 = animelem = 3
+statetype = A
+physics = N
+
+[state 930, 速度設定]
+type = velset
+trigger1 = animelem = 4
+x = 5.9
+y = -8.5
+
+[state 930, 重力]
+type = veladd
+trigger1 = animelemtime(4) > 0
+y = 0.56
+
+[state 930, 攻撃判定]
+type = hitdef
+trigger1 = (animelemno(0) = [7,8]) && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(105 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -6.2,-5.7
+guard.velocity = -11
+air.velocity = -6.2, -5.7
+airguard.velocity = -7.4, -1
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 930, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(105*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 930, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 930, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(105*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 930, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 930, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 9
+movetype = I
+
+[state 930, 着地]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 1110
+
+
+
+;-|通常技(立ち攻撃)|------------------------------------------------------------------------------------------
+
+;近距離立ち弱パンチ
+[Statedef 200]
+type    = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 200
+poweradd = 0
+sprpriority = 2
+
+[state 200, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,0
+
+[State 200, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 2 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(27 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = -10,-67
+hitsound = s2,0
+guardsound = s1,0
+animtype = Light
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 200, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(27*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 200, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 200, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(27*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 200, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 200, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[State 200, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;遠距離立ち弱パンチ
+[Statedef 201]
+type    = S
+movetype =A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 201
+poweradd = 0
+sprpriority = 2
+
+[state 201, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,0
+
+[state 201, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 2 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(22 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,0
+guardsound = s1,0
+animtype = Light
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 201, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(22*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 201, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 201, ガードクラッシュ値加算]
+type = varadd
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(22*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 201, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 201, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[State 201, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち中パンチ
+[statedef 202]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 202
+poweradd = 15*var(40)
+sprpriority = 1
+
+[state 202, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,1
+
+[state 202, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(60 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-50
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 202, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(60*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 202, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 202, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(60*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 202, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 202, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[State 202, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち強パンチ(近)
+[statedef 203]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 203
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 203, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,2
+
+[state 203, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 4 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(90 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-75
+hitsound = s2,2
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 203, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(90*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 203, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 203, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(90*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 203, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 203, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5
+movetype = I
+
+[State 203, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち強パンチ(遠)
+[statedef 204]
+type    = S
+movetype =A
+physics = N
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 204
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 204, SE1]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,0
+
+[state 204, SE2]
+type = playsnd
+trigger1 = animelem = 5
+value = 3,2
+
+[state 204, ガードポイント]
+type = reversaldef
+trigger1 = animelemno(0) = 2
+reversal.attr = SCA,AA,AP
+priority = 7,hit
+pausetime = 12,12
+sparkno = s8100
+hitsound = s1,0
+numhits = 0
+
+[state 204, 当身判定リセット]
+type = movehitreset
+trigger1 = animelem = 3
+
+[state 204, 攻撃判定]
+type = HitDef
+trigger1 = animelemno(0) = 7 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(84 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,2
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 204, 移動1]
+type = posadd
+trigger1 = Animelem = 4
+x = 20
+
+[state 204, 移動2]
+type = posadd
+trigger1 = Animelem = 5
+x = 20
+
+[state 204, 移動3]
+type = posadd
+trigger1 = Animelem = 6
+x = 20
+
+[state 204, 移動4]
+type = posadd
+trigger1 = animelem = 10
+x = -20
+
+[state 204, 移動5]
+type = posadd
+trigger1 = animelem = 11
+x = -10
+
+[state 204, 移動6]
+type = posadd
+trigger1 = animelem = 12
+x = -10
+
+[state 204, 移動7]
+type = posadd
+trigger1 = animelem = 13
+x = -20
+
+[state 204, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(84*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 204, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 204, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(84*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 204, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 204, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[State 204, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;立ち弱キック(近)
+[statedef 210]
+type    = S
+movetype =A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 210
+poweradd = 0
+sprpriority = 2
+
+[state 210, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,3
+
+[state 210, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,4]) && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(28 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,3
+guardsound = s1,0
+animtype = Light
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 210, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 210, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 210, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 210, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 210, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5
+movetype = I
+
+[State 210, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち弱キック(遠)
+[statedef 211]
+type    = S
+movetype =A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 211
+poweradd = 0
+sprpriority = 2
+
+[state 211, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,3
+
+[state 211, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(24 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-55
+hitsound = s2,3
+guardsound = s1,0
+animtype = Light
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 211, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(24*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 211, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 211, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(24*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 211, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 211, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[State 211, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち中キック(近)
+[statedef 212]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 212
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 212, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,4
+
+[state 212, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,4]) && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-50
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 212, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 212, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 212, ガードクラッシュ値加算]
+type = varadd
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 212, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 212, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5
+movetype = I
+
+[State 212, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち中キック(遠)
+[statedef 213]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 213
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 213, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,4
+
+[state 213, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(50 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 213, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(50*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 213, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 213, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(50*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 213, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 213, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[State 213, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち強キック(近)
+[statedef 214]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 214
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 214, SE]
+type = playsnd
+trigger1 = animelem = 3
+value = 3,5
+
+[state 214, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 5 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(100 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 214, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(100*fvar(9)*0.1)
+persistent = 0
+ignorehitpause = 1
+
+[state 214, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 214, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(100*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 214, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 214, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[State 214, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;立ち強キック(遠)
+[statedef 215]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 215
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 215, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,5
+
+[state 215, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 4 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(90 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,0
+animtype = Hard
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 215, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(90*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 215, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 215, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(90*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 215, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 215, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5
+movetype = I
+
+[State 215, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;----|通常技(しゃがみ攻撃)|---------------------------------------------------------------------
+
+;しゃがみ弱パンチ
+[Statedef 301]
+type    = C
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 301
+poweradd = 0
+sprpriority = 2
+
+[state 301, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,0
+
+[State 301, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 2 && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(20 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = -10,-50
+hitsound = s2,0
+guardsound = s1,0
+animtype = Light
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 301, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(20*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 301, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 301, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(20*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 301, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 301, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[State 301, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;しゃがみ中パンチ
+[statedef 303]
+type    = C
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 303
+poweradd = 15*var(40)
+sprpriority = 1
+
+[state 303, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,1
+
+[state 303, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(60 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-50
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 303, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(60*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 303, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 303, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(60*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 303, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 303, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[State 303, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;しゃがみ強パンチ
+[statedef 305]
+type    = C
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 305
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 305, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,2
+
+[state 305, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,5]) && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(90 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-75
+hitsound = s2,2
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 305, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(90*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 305, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 305, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(90*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 305, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 305, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[State 305, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;しゃがみ弱キック
+[statedef 311]
+type    = C
+movetype =A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 311
+poweradd = 0
+sprpriority = 2
+
+[state 311, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,3
+
+[state 311, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 2 && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(15 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = L
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-5
+hitsound = s2,3
+guardsound = s1,0
+animtype = Light
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(2*var(11))
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 311, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(15*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 311, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 311, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(15*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 311, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 311, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[State 311, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;しゃがみ中キック
+[statedef 313]
+type    = C
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 313
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 313, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,4
+
+[state 313, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,4]) && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(50 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = L
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-35
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 313, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(50*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 313, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 313, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(50*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 313, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 313, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5
+movetype = I
+
+[State 313, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;しゃがみ強キック
+[statedef 315]
+type    = C
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 315
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 315, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,5
+
+[state 315, 接触判定拡大]
+type = width
+trigger1 = animelemno(0) = [1,7]
+value = 20,0
+
+[state 315, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [4,5]) && !movecontact && !movereversed
+attr = C,NA
+damage = ceil(90 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = L
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-5
+hitsound = s2,5
+guardsound = s1,0
+animtype = Hard
+ground.type = trip
+air.type = Low
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = 0,-3.5
+guard.velocity = -11
+air.velocity = 0, -3.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 315, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(90*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 315, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 315, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(90*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 315, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 315, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[state 315, 接触判定縮小]
+type = width
+trigger1 = animelemno(0) = 8
+value = 30,0
+
+[State 315, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 11
+ctrl = 1
+
+;------|通常技(ジャンプ攻撃)|--------------------------------------------------------------------------
+
+;ジャンプ弱パンチ
+[statedef 401]
+type    = A
+movetype =A
+physics = N
+juggle = 1
+ctrl = 0
+anim = 401
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 401, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 401, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,0
+
+[state 401, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [2,3]) && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(42 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = 0,-40
+hitsound = s2,0
+guardsound = s1,0
+animtype = Light
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 12
+ground.hittime = 12+(2*var(11))
+guard.ctrltime = 14
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+airguard.velocity = -4, -1
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 401, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(42*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 401, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 401, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(42*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 401, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 401, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4 && prevstateno != 55
+movetype = I
+
+[State 401, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 401, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;ジャンプ中パンチ
+[statedef 403]
+type    = A
+movetype =A
+physics = N
+juggle = 1
+ctrl = 0
+anim = 403
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 403, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 403, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,1
+
+[state 403, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,4]) && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(55 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = 0,-40
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(3*var(11))
+guard.ctrltime = 19
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+airguard.velocity = -5, -1
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 403, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(55*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 403, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 403, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(55*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 403, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 403, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5 && prevstateno != 55
+movetype = I
+
+[State 403, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 403, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;ジャンプ強パンチ
+[statedef 405]
+type    = A
+movetype =A
+physics = N
+juggle = 4
+ctrl = 0
+anim = 405
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 405, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 405, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,2
+
+[state 405, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [4,5]) && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(98 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,0
+animtype = Hard
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(2*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(4*var(11))
+guard.ctrltime = 23
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+airguard.velocity = -5.3, -1
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 405, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(98*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 405, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 405, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(98*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 405, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 405, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6 && prevstateno != 55
+movetype = I
+
+[State 405, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 405, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;ジャンプ弱キック
+[statedef 411]
+type    = A
+movetype =A
+physics = N
+juggle = 1
+ctrl = 0
+anim = 411
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 411, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 411, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,3
+
+[state 411, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [2,3]) && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(35 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8200
+guard.sparkno = s8100
+sparkxy = 0,-50
+hitsound = s2,0
+guardsound = s1,0
+animtype = Light
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 23+(2*var(11))
+ground.slidetime = 12
+ground.hittime = 12+(2*var(11))
+guard.ctrltime = 14
+ground.velocity = -4
+guard.velocity = -4.4
+air.velocity = -3.75, -5
+airguard.velocity = -4, -1
+air.hittime = 14+(2*var(11))
+getpower = 60*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 411, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(35*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 411, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 411, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(35*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 411, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 411, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4 && prevstateno != 55
+movetype = I
+
+[State 411, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 411, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;ジャンプ中キック
+[statedef 413]
+type    = A
+movetype =A
+physics = N
+juggle = 1
+ctrl = 0
+anim = 413
+poweradd = 20*var(40)
+sprpriority = 2
+
+[state 413, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 413, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,4
+
+[state 413, 攻撃判定]
+type = HitDef
+trigger1 = (AnimElemNo(0) = [3,4]) && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(55 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 3,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = 0,-40
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(3*var(11))
+guard.ctrltime = 19
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+airguard.velocity = -5, -1
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 413, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(55*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 413, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 413, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(55*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 413, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 413, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 5 && prevstateno != 55
+movetype = I
+
+[State 413, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 413, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;ジャンプ強キック
+[statedef 415]
+type    = A
+movetype =A
+physics = N
+juggle = 4
+ctrl = 0
+anim = 415
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 415, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 415, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,5
+
+[state 415, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 5 && !movecontact && !movereversed
+attr = A,NA
+damage = ceil(85 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HA
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,0
+animtype = Hard
+air.animtype = back
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 14
+ground.hittime = 14+(4*var(11))
+guard.ctrltime = 23
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+airguard.velocity = -5.3, -1
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 415, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(85*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 415, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 415, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(85*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 415, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 415, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6 && prevstateno != 55
+movetype = I
+
+[State 415, 終了(通常ジャンプ時)]
+type = ChangeState
+trigger1 = Pos Y >= 0 && prevstateno != 55
+value = 52
+
+[State 415, 終了(小ジャンプ時)]
+type = changestate
+trigger1 = Pos Y >= 0 && prevstateno = 55
+value = 57
+
+;-|コンビネーションアーツ|-------------------------------------------------------------
+
+;連拳
+[statedef 501]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 3,0
+ctrl = 0
+anim = 501
+poweradd = 15*var(40)
+sprpriority = 1
+
+[state 501, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 3,1
+
+[state 501, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(47 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-65
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -3.0
+guard.velocity = -3.3
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 501, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(47*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 501, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 501, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(47*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 501, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 501, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[state 501, 前進停止]
+type = velset
+trigger1 = animelem = 6
+x = 0
+
+[State 501, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;連拳上段蹴り
+[statedef 502]
+type    = S
+movetype =A
+physics = N
+juggle = 4
+ctrl = 0
+anim = 502
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 502, SE]
+type = playsnd
+trigger1 = animelem = 3
+value = 3,4
+
+[state 502, 速度設定]
+type = velset
+trigger1 = animelem = 3
+x = 2.0
+
+[state 502, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 5 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(50 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -3.0
+guard.velocity = -3.3
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 502, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(50*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 502, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 502, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(50*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 502, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 502, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[state 502, 移動終了]
+type = velset
+trigger1 = animelem = 7
+x = 0
+
+[State 502, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;連拳二段蹴り
+[statedef 503]
+type = S
+movetype = A
+physics = N
+juggle = 1
+ctrl = 0
+anim = 503
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 503, 速度設定]
+type = velset
+trigger1 = animelem = 3
+x = 3.0
+
+[state 503, SE]
+type = playsnd
+trigger1 = animelem = 5
+value = 3,5
+
+[state 503, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 9 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,5
+guardsound = s1,0
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 19
+ground.hittime = 23+(4*var(11))
+ground.velocity = -3.0,-2.0
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 503, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 503, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 503, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 503, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 503, 移動終了]
+type = velset
+trigger1 = animelem = 12
+x = 0
+
+[state 503, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 10
+movetype = I
+
+[state 503, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;-|特殊技|----------------------------------------------------------------------------------
+
+;上段左後ろ回し蹴り
+[statedef 600]
+type = S
+movetype = A
+physics = N
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 600
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 600, 速度]
+type = velset
+trigger1 = time = 0
+x = 5.6
+
+[state 600, 減速]
+type = veladd
+trigger1 = animelemtime(10) < 0
+x = -0.15
+
+[state 600, SE]
+type = playsnd
+trigger1 = animelem = 3
+value = 52,0
+
+[state 600, SE2]
+type = playsnd
+trigger1 = animelem = 5
+value = 3,5
+
+[state 600, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 9 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-70
+hitsound = s2,4
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 600, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 600, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 600, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 600, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 600, 移動終了]
+type = velset
+trigger1 = animelem = 10
+x = 0
+
+[state 600, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 10
+movetype = I
+
+[state 600, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;ブロック割り
+[statedef 610]
+type = S
+movetype = A
+physics = S
+juggle = 1
+velset = 0,0
+ctrl = 0
+anim = 610
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 610, SE]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,2
+
+[state 610, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 6 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = H
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-30
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+ground.type = Low
+air.type = Low
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 610, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 610, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 610, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 610, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 610, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 7
+movetype = I
+
+[state 610, 座標移動]
+type = posadd
+trigger1 = animelem = 9
+x = 19
+
+[state 610, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;-|通常投げ|--------------------------------------------------------------------------------
+
+;パチキ
+[statedef 700]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+ctrl = 0
+anim = 700
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 700, ガード動作移行無効化]
+type = attackdist
+trigger1 = time = 0
+value = 0
+
+[state 700, 攻撃判定]
+type = hitdef
+triggerall = (P2stateno != [150,155]) && P2stateno != 40
+triggerall = P2bodydist X = [-32, 32]
+triggerall = var(6) = 0
+trigger1 = animelem = 2
+attr = S,NT
+hitflag = HL
+priority = 1, miss
+sparkno = -1
+P2facing = 1
+P1stateno = 701
+P2stateno = 705
+fall = 1
+fall.recover = 0
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 700, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[state 700, 空振りモーション終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;パチキ(投げ動作)
+[statedef 701]
+type = S
+movetype = A
+physics = N
+anim = 701
+poweradd = 0
+
+[state 701, SE]
+type = playsnd
+trigger1 = time = 0
+value = 700,0
+
+[state 701, 投げ抜けフラグリセット]
+type = varset
+trigger1 = time = 0 || time = 7
+var(8) = 0
+
+[state 701, 投げ抜けフラグセット]
+type = varset
+triggerall = time <= 6 && var(7) = 0
+triggerall = target,command = "holdfwd" || target,command = "holdback"
+trigger1 = target,command = "x" || target,command = "y" || target,command = "z"
+trigger1 = target,command != "a" && target,command != "b" && target,command != "c"
+var(8) = 1
+
+[state 701, 投げられ側座標1]
+type = targetbind
+trigger1 = animelemtime(8) <= 0
+pos = 30, 0
+
+[state 701, 投げ抜け移行]
+type = changestate
+triggerall = (time = [1,6]) && var(7) = 0
+trigger1 = var(8) = 1
+value = 760
+
+[state 701, SE2]
+type = playsnd
+trigger1 = animelem = 6
+value = 3,2
+
+[state 701, SE3]
+type = playsnd
+trigger1 = animelem = 7
+value = 2,2
+
+[state 701, ヒットマーク]
+type = explod
+trigger1 = animelem = 7
+anim = 8202
+scale = 1.0, 1.0
+sprpriority = 2
+postype = P1
+pos = 30, -59
+
+[state 701, 投げダメージ]
+type = targetlifeadd
+trigger1 = animelem = 7
+value = ceil(-126 * (fvar(1)*fvar(3)*fvar(4)*fvar(5)*fvar(6)))
+
+[state 701, 投げられ側を投げられ終了ステートに送る]
+type = targetstate
+trigger1 = animelem = 8
+value = 706
+
+[state 701, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;パチキ、投げられ動作
+[statedef 705]
+type = A
+movetype = H
+physics = N
+velset = 0, 0
+
+[state 705, 投げられ動作アニメ]
+type = changeanim2
+trigger1 = time = 0
+value = 705
+
+;パチキ、投げられ終了
+[statedef 706]
+type = A
+movetype = H
+physics = N
+velset = -5.5, -5.5
+
+[state 706, 重力]
+type = veladd
+trigger1 = 1
+y = 0.4
+
+[state 706, 投げられ終了～ダウン]
+type = selfstate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 5100 
+
+;背負い投げ
+[statedef 710]
+type = S
+movetype = A
+physics = S
+juggle = 0
+velset = 0,0
+ctrl = 0
+anim = 710
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 710, ガード動作移行無効化]
+type = attackdist
+trigger1 = time = 0
+value = 0
+
+[state 710, 攻撃判定]
+type = hitdef
+triggerall = (P2stateno != [150,155]) && P2stateno != 40
+triggerall = P2bodydist X = [-32, 32]
+triggerall = var(6) = 0
+trigger1 = animelem = 2
+attr = S,NT
+hitflag = HL
+priority = 1, miss
+sparkno = -1
+P2facing = 1
+P1stateno = 711
+P2stateno = 715
+fall = 1
+fall.recover = 0
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 710, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 3
+movetype = I
+
+[state 710, 空振りモーション終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;背負い投げ、投げ動作
+[statedef 711]
+type = S
+movetype = A
+physics = N
+anim = 711
+poweradd = 0
+
+[state 711, SE2]
+type = playsnd
+trigger1 = time = 0
+value = 700,0
+
+[state 711, 投げ抜けフラグリセット]
+type = varset
+trigger1 = time = 0 || time = 4
+var(8) = 0
+
+[state 711, 投げ抜けフラグセット]
+type = varset
+triggerall = time <= 3 && var(7) = 0
+triggerall = target,command = "holdfwd" || target,command = "holdback"
+trigger1 = target,command = "a" || target,command = "b" || target,command = "c"
+trigger1 = target,command != "x" && target,command != "y" && target,command != "z"
+var(8) = 1
+
+[state 711, 投げ抜け移行]
+type = changestate
+triggerall = (time = [1,3]) && var(7) = 0
+trigger1 = var(8) = 1
+value = 760
+
+[state 711, SE2]
+type = playsnd
+trigger1 = animelem = 5
+value = 3, 5
+
+[state 711, 壁接触判定拡大]
+type = width
+trigger1 = animelemno(0) = [6,9]
+edge = 0, 50
+
+[state 711, 投げられ側座標1]
+type = targetbind
+trigger1 = animelemtime(2) < 0
+pos = 50, 0
+
+[state 711, 投げられ側座標2]
+type = targetbind
+trigger1 = animelemno(0) = 2
+pos = 50, 0
+
+[state 711, 投げられ側座標3]
+type = targetbind
+trigger1 = animelemno(0) = 3
+pos = 45, 0
+
+[state 711, 投げられ側座標4]
+type = targetbind
+trigger1 = animelemno(0) = 4
+pos = 38, -50
+
+[state 711, 投げられ側座標5]
+type = targetbind
+trigger1 = animelemno(0) = 5
+pos = 15, -90
+
+[state 711, 投げられ側座標6]
+type = targetbind
+trigger1 = animelemno(0) = 6
+pos = -35, -105
+
+[state 711, 投げられ側座標7]
+type = targetbind
+trigger1 = animelemno(0) = 7
+pos = -75, -34
+
+[state 711, 投げられ側座標8]
+type = targetbind
+trigger1 = animelem = 8
+pos = -70, 0
+
+[state 711, 投げダメージ]
+type = targetlifeadd
+trigger1 = animelem = 8
+value = ceil(-140 * (fvar(1)*fvar(3)*fvar(4)*fvar(5)*fvar(6)))
+
+[state 711, 投げられ側を投げられ終了ステートに送る]
+type = targetstate
+trigger1 = animelem = 8
+value = 716
+
+[state 711, 叩きつけSE]
+type = playsnd
+trigger1 = animelem = 8
+value = 5100,0
+
+[state 711, 叩きつけエフェクト]
+type = explod
+trigger1 = animelem = 8
+anim = 8210
+scale = 0.5,0.5
+sprpriority = 0
+postype = P1
+pos = -70, 0
+
+[state 711, ターン]
+type = turn
+trigger1 = animelem = 12
+
+[state 711, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;背負い投げ、投げられ動作
+[statedef 715]
+type = A
+movetype = H
+physics = N
+velset = 0, 0
+
+[state 715, 投げられ動作アニメ]
+type = changeanim2
+trigger1 = time = 0
+value = 715
+
+;背負い投げ、投げられ終了
+[statedef 716]
+type = A
+movetype = H
+physics = N
+
+[State 716, 速度設定]
+type = VelSet
+trigger1 = Time = 0
+trigger1 = GetHitVar(fall.yvel) = 0
+trigger1 = vel x > 1
+x = 1
+
+[State 716, EnvShake]
+type = FallEnvShake
+trigger1 = Time = 0
+
+[State 716, 接地アニメ] ;Hit ground anim (normal)
+type = ChangeAnim
+trigger1 = time = 0
+value = 5100
+
+[State 716, 座標調整]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 716, 速度設定2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 716, 速度調整3] ;Reduce speed
+type = VelMul
+trigger1 = Time = 0
+x = 0.75
+
+[State 716, バウンドへ移行]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 717
+
+;投げられ終了動作(バウンド)
+[statedef 717]
+type    = L
+movetype= H
+physics = N
+
+[State 717, バウンドアニメ] ;Coming hit ground anim (normal)
+type = ChangeAnim
+trigger1 = time = 0
+value = 5160
+
+[State 717, バウンド速度設定]
+type = HitFallVel
+trigger1 = Time = 0
+
+[State 717, 座標調整]
+type = PosSet
+trigger1 = Time = 0
+y = 20
+
+[State 717, 重力] ;Acceleration
+type = VelAdd
+trigger1 = 1
+y = .4
+
+[State 717, 再接地(投げられ終了)] ;Hit ground
+trigger1 = Vel Y > 0
+trigger1 = Pos Y >= 12
+type = selfstate
+value = 5110
+
+;-|投げ抜け|------------------------------------------------------------------------------
+
+;投げ抜け動作(抜けられ側)
+[statedef 760]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 5945
+sprpriority = 0
+
+[state 760, SE]
+type = playsnd
+trigger1 = time = 0
+value = 700,1
+
+[state 760, エフェクト]
+type = explod
+trigger1 = time = 0
+anim = 8130
+ID=8130
+scale = 0.5,0.5
+sprpriority = 2
+postype = P2
+pos = 30,-75
+
+[state 760, 相手側を投げ抜けステートへ]
+type = targetstate
+trigger1 = time = 0
+value = 765
+
+[state 760, 速度]
+type = velset
+trigger1 = time = 0
+x = -5.0
+
+[state 760, 減速加速度]
+type = veladd
+trigger1 = vel X < -0.26
+x = 0.26
+
+[state 760, 動作終了]
+type = changestate
+trigger1 = time = 32
+value = 0
+ctrl = 1
+
+;投げ抜け動作(抜け側)
+[statedef 765]
+type = S
+movetype = I
+physics = N
+velset = 0,0
+ctrl = 0
+sprpriority = 1
+
+[state 765, 無敵]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 765, 接触判定無効]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 765, アニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5940)=1,5940,150)
+
+[state 765, アニメ変更]
+type = changeanim
+trigger1 = anim = 150
+trigger1 = time = 25
+value = 140
+
+[state 765, アニメ変更2]
+type = changeanim
+trigger1 = anim = 5940
+trigger1 = time < 30 && animtime = 1
+value = 5940
+elem = animelemno(0)
+
+[state 765, 速度]
+type = velset
+trigger1 = time = 0
+x = -3
+
+[state 765, 減速加速度]
+type = veladd
+trigger1 = vel X < -0.26
+x = 0.12
+
+[state 765, 動作終了]
+type = selfstate
+trigger1 = time = 30
+value = 0
+ctrl = 1
+
+
+;-|カウンター攻撃|------------------------------------------------------------------------
+
+;合わせ突き（Ｐカウンター攻撃）
+[statedef 810]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 202
+poweradd = 15*var(40)
+sprpriority = 1
+
+[state 810, 背後に回られていたら振り向く]
+type = turn
+trigger1 = time = 0
+trigger1 = P2dist X < 0
+
+[state 810, SE]
+type = playsnd
+trigger1 = animelem = 1
+value = 3,1
+
+[state 810, 残像消去]
+type = afterimage
+trigger1 = time = 0
+time = 0
+
+[state 810, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 3 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(60 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8201
+guard.sparkno = s8100
+sparkxy = -10,-50
+hitsound = s2,1
+guardsound = s1,0
+animtype = Medium
+ground.type = High
+air.type = High
+fall = 0
+fall.recovertime = 28+(3*var(11))
+ground.slidetime = 19
+ground.hittime = 19+(3*var(11))
+ground.velocity = -6
+guard.velocity = -6.6
+air.velocity = -4, -5.2
+air.hittime = 19+(3*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 810, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(60*fvar(9)*0.1)
+persistent = 0
+
+[state 810, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 810, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(60*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 810, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 810, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 4
+movetype = I
+
+[State 810, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+;大外回し蹴り（Ｋカウンター攻撃）
+[statedef 820]
+type    = S
+movetype =A
+physics = S
+juggle = 4
+velset = 0,0
+ctrl = 0
+anim = 214
+poweradd = 15*var(40)
+sprpriority = 2
+
+[state 820, 背後に回られていたら振り向く]
+type = turn
+trigger1 = time = 0
+trigger1 = P2dist X < 0
+
+[state 820, SE]
+type = playsnd
+trigger1 = animelem = 3
+value = 3,5
+
+[state 820, 残像消去]
+type = afterimage
+trigger1 = time = 0
+time = 0
+
+[state 820, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 5 && !movecontact && !movereversed
+attr = S,NA
+damage = ceil(100 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), 0
+guardflag = HL
+hitflag = HLAF
+priority = 4,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8100
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,0
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.2,-5.5
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,180,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 820, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(100*fvar(9)*0.1)
+persistent = 0
+
+[state 820, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 820, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(100*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 820, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 820, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 6
+movetype = I
+
+[State 820, 終了]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 0
+ctrl = 1
+
+
+;----|必殺技|-------------------------------------------------------------------------------------------------
+
+;正拳木霊（弱）
+[statedef 1000]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+juggle = 4
+ctrl = 0
+anim = 1000
+poweradd = 60*var(40)
+sprpriority = 1
+
+[state 1000, SE1]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,2
+
+[state 1000, SE2]
+type = playsnd
+trigger1 = animelem = 6
+value = 1000,0
+
+[state 1000, 旋風エフェクト]
+type = explod
+trigger1 = animelem = 4
+anim = 7000
+ID = 7000
+pos = 35,0
+postype = P1
+facing = 1
+vel = 0,0
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1000, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 6 && !movecontact && !movereversed
+attr = S,SA
+damage = ceil(42 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(4 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.2
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1000, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(42*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1000, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1000, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(42*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1000, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1000, 飛び道具発射]
+type = helper
+trigger1 = animelem = 7
+helpertype = normal
+name = "kodama"
+ID = 7005
+stateno = 7005
+pos = 35,0
+postype = P1
+facing = 1
+
+[state 1000, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;正拳木霊（中）
+[statedef 1001]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+juggle = 4
+ctrl = 0
+anim = 1001
+poweradd = 60*var(40)
+sprpriority = 1
+
+[state 1001, SE1]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,2
+
+[state 1001, SE2]
+type = playsnd
+trigger1 = animelem = 6
+value = 1000,0
+
+[state 1001, 旋風エフェクト]
+type = explod
+trigger1 = animelem = 4
+anim = 7000
+ID = 7000
+pos = 35,0
+postype = P1
+facing = 1
+vel = 0,0
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1001, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 6 && !movecontact && !movereversed
+attr = S,SA
+damage = ceil(49 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(4*(fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.2
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1001, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(49*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1001, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1001, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(47*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1001, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1001, 飛び道具発射]
+type = helper
+trigger1 = animelem = 7
+helpertype = normal
+name = "kodama"
+ID = 7005
+stateno = 7006
+pos = 35,0
+postype = P1
+facing = 1
+
+[state 1001, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;正拳木霊（強）
+[statedef 1002]
+type = S
+movetype = A
+physics = S
+velset = 0,0
+juggle = 4
+ctrl = 0
+anim = 1002
+poweradd = 60*var(40)
+sprpriority = 1
+
+[state 1002, SE1]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,2
+
+[state 1002, SE2]
+type = playsnd
+trigger1 = animelem = 6
+value = 1000,0
+
+[state 1002, 旋風エフェクト]
+type = explod
+trigger1 = animelem = 4
+anim = 7000
+ID = 7000
+pos = 35,0
+postype = P1
+facing = 1
+vel = 0,0
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1002, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 6 && !movecontact && !movereversed
+attr = S,SA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(5*(fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.2
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1002, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1002, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1002, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1002, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1002, 飛び道具発射]
+type = helper
+trigger1 = animelem = 7
+helpertype = normal
+name = "kodama"
+ID = 7005
+stateno = 7007
+pos = 35,0
+postype = P1
+facing = 1
+
+[state 1002, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;正拳木霊・弾（弱）
+[statedef 7005]
+type = A
+movetype = A
+physics = N
+velset = 2.2,0
+juggle = 1
+ctrl = 0
+anim = 7005
+poweradd = 0
+
+[state 7005, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 7005,0
+
+[state 7005, 飛び道具に接触]
+type = hitoverride
+trigger1 = 1
+attr = SCA,AA,AT,AP
+stateno = 7010
+
+[state 7005, 飛び道具以外に無敵]
+type = nothitby
+trigger1 = 1
+value = ,AA,AT
+
+[state 7005, コンボ補正値]
+type = varset
+trigger1 = 1
+fvar(1) = parent,fvar(1)
+
+[state 7005, カウンターヒット補正値]
+type = varset
+trigger1 = 1
+fvar(2) = parent,fvar(2)
+
+[state 7005, 残体力補正値(自分)]
+type = varset
+trigger1 = 1
+fvar(3) = parent,fvar(3)
+
+[state 7005, 残体力補正値(相手)]
+type = varset
+trigger1 = 1
+fvar(4) = parent,fvar(4)
+
+[state 7005, POWゲージ補正値]
+type = varset
+trigger1 = 1
+fvar(6) = parent,fvar(6)
+
+[state 7005, ガードクラッシュ値連続ガード補正]
+type = varset
+trigger1 = 1
+fvar(7) = parent,fvar(7)
+
+[state 7005, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = 1
+fvar(8) = parent,fvar(8)
+
+[state 7005, カウンターヒット補正値(気絶値用)]
+type = varset
+trigger1 = 1
+fvar(9) = parent,fvar(9)
+
+[state 7005, カウンターヒット判定(硬直時間変化用)]
+type = varset
+trigger1 = 1
+var(11) = parent,var(11)
+
+[state 7005, 攻撃判定]
+type = HitDef
+trigger1 = (animelemno(0) = [1,6]) && !movecontact && !movereversed
+attr = A,SP
+damage = ceil(28 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(2*(fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 0,9
+sparkno = s8203
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = 0,0
+givepower = 0,0
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 7005, ヒット時のパワー取得]
+type = poweradd
+trigger1 = movehit = 1
+value = ifelse(var(10)=0,120,60)*root,var(40)
+
+[state 7005, ガード時のパワー取得]
+type = poweradd
+trigger1 = moveguarded = 1
+value = 30*root,var(40)
+
+[state 7005, 相手へのパワー加算]
+type = targetpoweradd
+trigger1 = movecontact = 1
+value = 30
+
+[state 7005, コンボヒット数カウント加算]
+type = parentvaradd
+trigger1 = movehit = 1
+var(10) = 1
+
+[state 7005, 連続ガードカウント数加算]
+type = parentvaradd
+trigger1 = moveguarded = 1
+var(12) = 1
+
+[state 7005, 気絶値リセット用タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(23) = 180-root,var(23)
+
+[state 7005, ガードクラッシュ値回復タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(26) = 180-root,var(26)
+
+[state 7005, 気絶値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 7005, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+triggerall = numtarget
+trigger1 = root,var(22) >= ceil(enemy,const(data.life)*0.05)+root,var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 7005, ガードクラッシュ値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 7005, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+triggerall = numtarget
+trigger1 = root,var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 7005, 自壊ステートへ跳ぶ]
+type = changestate
+trigger1 = movecontact
+trigger2 = movereversed
+trigger3 = animtime = 0
+value = 7010
+
+;正拳木霊・弾（中）
+[statedef 7006]
+type = A
+movetype = A
+physics = N
+velset = 3.2,0
+juggle = 1
+ctrl = 0
+anim = 7006
+poweradd = 0
+
+[state 7006, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 7005,0
+
+[state 7006, 飛び道具に接触]
+type = hitoverride
+trigger1 = 1
+attr = SCA,AA,AT,AP
+stateno = 7010
+
+[state 7006, 飛び道具以外に無敵]
+type = nothitby
+trigger1 = 1
+value = ,AA,AT
+
+[state 7006, コンボ補正値]
+type = varset
+trigger1 = 1
+fvar(1) = parent,fvar(1)
+
+[state 7006, カウンターヒット補正値]
+type = varset
+trigger1 = 1
+fvar(2) = parent,fvar(2)
+
+[state 7006, 残体力補正値(自分)]
+type = varset
+trigger1 = 1
+fvar(3) = parent,fvar(3)
+
+[state 7006, 残体力補正値(相手)]
+type = varset
+trigger1 = 1
+fvar(4) = parent,fvar(4)
+
+[state 7006, POWゲージ補正値]
+type = varset
+trigger1 = 1
+fvar(6) = parent,fvar(6)
+
+[state 7006, ガードクラッシュ値連続ガード補正]
+type = varset
+trigger1 = 1
+fvar(7) = parent,fvar(7)
+
+[state 7006, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = 1
+fvar(8) = parent,fvar(8)
+
+[state 7006, カウンターヒット補正値(気絶値用)]
+type = varset
+trigger1 = 1
+fvar(9) = parent,fvar(9)
+
+[state 7006, カウンターヒット判定(硬直時間変化用)]
+type = varset
+trigger1 = 1
+var(11) = parent,var(11)
+
+[state 7006, 攻撃判定]
+type = HitDef
+trigger1 = (animelemno(0) = [1,6]) && !movecontact && !movereversed
+attr = A,SP
+damage = ceil(28 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(2*(fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 0,9
+sparkno = s8203
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = 0,0
+givepower = 0,0
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 7006, ヒット時のパワー取得]
+type = poweradd
+trigger1 = movehit = 1
+value = ifelse(var(10)=0,120,60)*root,var(40)
+
+[state 7006, ガード時のパワー取得]
+type = poweradd
+trigger1 = moveguarded = 1
+value = 30*root,var(40)
+
+[state 7006, 相手へのパワー加算]
+type = targetpoweradd
+trigger1 = movecontact = 1
+value = 30
+
+[state 7006, コンボヒット数カウント加算]
+type = parentvaradd
+trigger1 = movehit = 1
+var(10) = 1
+
+[state 7006, 連続ガードカウント数加算]
+type = parentvaradd
+trigger1 = moveguarded = 1
+var(12) = 1
+
+[state 7006, 気絶値リセット用タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(23) = 180-root,var(23)
+
+[state 7006, ガードクラッシュ値回復タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(26) = 180-root,var(26)
+
+[state 7006, 気絶値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 7006, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+triggerall = numtarget
+trigger1 = root,var(22) >= ceil(enemy,const(data.life)*0.05)+root,var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 7006, ガードクラッシュ値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(42*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 7006, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+triggerall = numtarget
+trigger1 = root,var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 7006, 自壊ステートへ跳ぶ]
+type = changestate
+trigger1 = movecontact
+trigger2 = movereversed
+trigger3 = animtime = 0
+value = 7010
+
+;正拳木霊・弾（強）
+[statedef 7007]
+type = A
+movetype = A
+physics = N
+velset = 4.2,0
+juggle = 1
+ctrl = 0
+anim = 7007
+poweradd = 0
+
+[state 7007, SE]
+type = playsnd
+trigger1 = animelem = 2
+value = 7005,0
+
+[state 7007, 飛び道具に接触]
+type = hitoverride
+trigger1 = 1
+attr = SCA,AA,AT,AP
+stateno = 7010
+
+[state 7007, 飛び道具以外に無敵]
+type = nothitby
+trigger1 = 1
+value = ,AA,AT
+
+[state 7007, コンボ補正値]
+type = varset
+trigger1 = 1
+fvar(1) = parent,fvar(1)
+
+[state 7007, カウンターヒット補正値]
+type = varset
+trigger1 = 1
+fvar(2) = parent,fvar(2)
+
+[state 7007, 残体力補正値(自分)]
+type = varset
+trigger1 = 1
+fvar(3) = parent,fvar(3)
+
+[state 7007, 残体力補正値(相手)]
+type = varset
+trigger1 = 1
+fvar(4) = parent,fvar(4)
+
+[state 7007, POWゲージ補正値]
+type = varset
+trigger1 = 1
+fvar(6) = parent,fvar(6)
+
+[state 7007, ガードクラッシュ値連続ガード補正]
+type = varset
+trigger1 = 1
+fvar(7) = parent,fvar(7)
+
+[state 7007, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = 1
+fvar(8) = parent,fvar(8)
+
+[state 7007, カウンターヒット補正値(気絶値用)]
+type = varset
+trigger1 = 1
+fvar(9) = parent,fvar(9)
+
+[state 7007, カウンターヒット判定(硬直時間変化用)]
+type = varset
+trigger1 = 1
+var(11) = parent,var(11)
+
+[state 7007, 攻撃判定]
+type = HitDef
+trigger1 = (animelemno(0) = [1,6]) && !movecontact && !movereversed
+attr = A,SP
+damage = ceil(28 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(2*(fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 0,9
+sparkno = s8203
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = High
+air.type = High
+fall = 0
+air.fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -10
+guard.velocity = -11
+air.velocity = -4.2, -5.5
+air.hittime = 23+(4*var(11))
+getpower = 0,0
+givepower = 0,0
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 7007, ヒット時のパワー取得]
+type = poweradd
+trigger1 = movehit = 1
+value = ifelse(var(10)=0,120,60)*root,var(40)
+
+[state 7007, ガード時のパワー取得]
+type = poweradd
+trigger1 = moveguarded = 1
+value = 30*root,var(40)
+
+[state 7007, 相手へのパワー加算]
+type = targetpoweradd
+trigger1 = movecontact = 1
+value = 30
+
+[state 7007, コンボヒット数カウント加算]
+type = parentvaradd
+trigger1 = movehit = 1
+var(10) = 1
+
+[state 7007, 連続ガードカウント数加算]
+type = parentvaradd
+trigger1 = moveguarded = 1
+var(12) = 1
+
+[state 7007, 気絶値リセット用タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(23) = 180-root,var(23)
+
+[state 7007, ガードクラッシュ値回復タイマーリセット]
+type = parentvaradd
+trigger1 = movecontact = 1
+var(26) = 180-root,var(26)
+
+[state 7007, 気絶値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 7007, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(2) = 1
+triggerall = numtarget
+trigger1 = root,var(22) >= ceil(enemy,const(data.life)*0.05)+root,var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 7007, ガードクラッシュ値加算]
+type = parentvaradd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 7007, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = root,var(3) = 1
+triggerall = numtarget
+trigger1 = root,var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 7007, 自壊ステートへ跳ぶ]
+type = changestate
+trigger1 = movecontact
+trigger2 = movereversed
+trigger3 = animtime = 0
+value = 7010
+
+;正拳木霊・弾消滅
+[statedef 7010]
+type = A
+
+[state 7010, 判定消失]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 7010, 自壊]
+type = destroyself
+trigger1 = animtime = 0
+
+
+;真空飛び横蹴り(弱)
+[statedef 1100]
+type = S
+movetype = A
+physics = S
+anim = 1100
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1100, 無敵]
+type = nothitby
+trigger1 = animelemno(0) = [1,2]
+value = SCA,AA,AT,AP
+
+[state 1100, SE1]
+type = playsnd
+trigger1 = animelem = 2
+value = 40,1
+
+[state 1100, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1100, エフェクト（バックファイア）]
+type = explod
+trigger1 = animelem = 2
+anim = 7030
+ID = 7030
+pos = 0,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1100, 空中判定へ移行]
+type = statetypeset
+trigger1 = animelem = 2
+statetype = A
+physics = N
+
+[state 1100, 速度設定]
+type = velset
+trigger1 = animelem = 3
+x = 5.5
+y = -7.5
+
+[state 1100, 重力]
+type = veladd
+trigger1 = animelemtime(3) > 0
+y = 0.56
+
+[state 1100, 攻撃判定]
+type = hitdef
+trigger1 = (animelemno(0) = [6,7]) && !movecontact && !movereversed
+attr = A,SA
+damage = ceil(98 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -5.7,-5.5
+guard.velocity = -11
+air.velocity = -5.7, -5.5
+airguard.velocity = -6.8, -1
+air.hittime = 27+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1100, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(98*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1100, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1100, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(98*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1100, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1100, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1100, 着地]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 1110
+
+;真空飛び横蹴り(中)
+[statedef 1101]
+type = S
+movetype = A
+physics = S
+anim = 1101
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1101, 無敵]
+type = nothitby
+trigger1 = animelemno(0) = [1,2]
+value = SCA,AA,AT,AP
+
+[state 1101, SE1]
+type = playsnd
+trigger1 = animelem = 2
+value = 40,1
+
+[state 1101, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1101, エフェクト（バックファイア）]
+type = explod
+trigger1 = animelem = 2
+anim = 7030
+ID = 7030
+pos = 0,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1101, 空中判定へ移行]
+type = statetypeset
+trigger1 = animelem = 2
+statetype = A
+physics = N
+
+[state 1101, 速度設定]
+type = velset
+trigger1 = animelem = 3
+x = 5.9
+y = -8.5
+
+[state 1101, 重力]
+type = veladd
+trigger1 = animelemtime(3) > 0
+y = 0.56
+
+[state 1101, 攻撃判定]
+type = hitdef
+trigger1 = (animelemno(0) = [6,7]) && !movecontact && !movereversed
+attr = A,SA
+damage = ceil(105 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(10 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -6.2,-5.7
+guard.velocity = -11
+air.velocity = -6.2, -5.7
+airguard.velocity = -7.4, -1
+air.hittime = 27+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1101, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(105*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1101, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1101, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(105*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1101, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1101, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1101, 着地]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 1110
+
+;真空飛び横蹴り(強)
+[statedef 1102]
+type = S
+movetype = A
+physics = S
+anim = 1102
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1102, 無敵]
+type = nothitby
+trigger1 = animelemno(0) = [1,2]
+value = SCA,AA,AT,AP
+
+[state 1102, SE1]
+type = playsnd
+trigger1 = animelem = 2
+value = 40,1
+
+[state 1102, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1102, エフェクト（バックファイア）]
+type = explod
+trigger1 = animelem = 2
+anim = 7030
+ID = 7030
+pos = 0,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 1102, 空中判定へ移行]
+type = statetypeset
+trigger1 = animelem = 2
+statetype = A
+physics = N
+
+[state 1102, 速度設定]
+type = velset
+trigger1 = animelem = 3
+x = 6.5
+y = -9.5
+
+[state 1102, 重力]
+type = veladd
+trigger1 = animelemtime(3) > 0
+y = 0.56
+
+[state 1102, 攻撃判定]
+type = hitdef
+trigger1 = (animelemno(0) = [6,7]) && !movecontact && !movereversed
+attr = A,SA
+damage = ceil(112 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(11 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HLA
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -6.7,-5.9
+guard.velocity = -11
+air.velocity = -6.7, -5.9
+airguard.velocity = -8.0, -1
+air.hittime = 27+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1102, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(112*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1102, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1102, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(112*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1102, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1102, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1102, 着地]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 1110
+
+;真空飛び横蹴り(着地)
+[statedef 1110]
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 57
+sprpriority = 2
+
+[state 1110, 座標調整]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 1110, SE]
+type = playsnd
+trigger1 = time = 0
+value = 52,0
+
+[state 1110, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;正拳乱れ突き
+[statedef 1200]
+type = S
+movetype = A
+physics = S
+anim = 1200
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1200, SE1]
+type = playsnd
+trigger1 = animelem = 8
+trigger2 = animelem = 10
+trigger3 = animelem = 12
+trigger4 = animelem = 14
+trigger5 = animelem = 16
+trigger6 = animelem = 18
+value = 3,1
+
+[state 1200, SE2]
+type = playsnd
+trigger1 = animelem = 24
+value = 3,2
+
+[state 1200, 攻撃接触フラグリセット]
+type = movehitreset
+trigger1 = animelem = 9
+trigger2 = animelem = 11
+trigger3 = animelem = 13
+trigger4 = animelem = 15
+trigger5 = animelem = 17
+trigger6 = animelem = 19
+
+[state 1200, 攻撃判定1(連打部分1)]
+type = hitdef
+trigger1 = animelemno(0) = 8 && !movecontact && !movereversed
+trigger2 = animelemno(0) = 10 && !movecontact && !movereversed
+trigger3 = animelemno(0) = 12 && !movecontact && !movereversed
+trigger4 = animelemno(0) = 14 && !movecontact && !movereversed
+trigger5 = animelemno(0) = 16 && !movecontact && !movereversed
+trigger6 = animelemno(0) = 18 && !movecontact && !movereversed
+attr = S,SA
+damage = ceil(21 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(1 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 5,9
+sparkno = s8201
+guard.sparkno = s8101
+sparkxy = -10,-57
+hitsound = s2,2
+guardsound = s1,1
+animtype = Hard
+ground.type = Low
+air.type = Low
+fall = 1
+fall.recover = 1
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = 0,-3.0
+guard.velocity = 0
+air.velocity = 0, -3.0
+air.hittime = 27+(4*var(11))
+ground.cornerpush.veloff = 0
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす1]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 8
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす2]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 10
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす3]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 12
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす4]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 14
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす5]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 16
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ヒットした相手を専用やられ動作へ飛ばす6]
+type = targetstate
+trigger1 = movehit
+trigger1 = animelemno(0) = 18
+value = 1250
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整1]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 8
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整2]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 10
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整3]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 12
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整4]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 14
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整5]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 16
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 相手の座標調整6]
+type = targetbind
+trigger1 = movehit
+trigger1 = animelemno(0) = 18
+pos = 40,2*(8-animelemno(0))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 攻撃判定2(フィニッシュ部分)]
+type = hitdef
+trigger1 = animelemno(0) = 25 && !movecontact && !movereversed
+attr = S,SA
+damage = ceil(56 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(7 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 37+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 28+(4*var(11))
+ground.velocity = -5.0,-6.0
+guard.velocity = -11
+air.velocity = -5.0, -6.0
+air.hittime = 28+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1200, 気絶値加算(連打部分1)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 8
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(連打部分2)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 10
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(連打部分3)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 12
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(連打部分4)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 14
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(連打部分5)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 16
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(連打部分6)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 18
+trigger1 = movehit
+var(22) = floor(14*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶値加算(フィニッシュ部分)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 25
+trigger1 = movehit
+var(22) = floor(56*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+triggerall = animelemtime(25) >= 0
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1200, ガードクラッシュ値加算(連打部分1)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 8
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(連打部分2)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 10
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(連打部分3)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 12
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(連打部分4)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 14
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(連打部分5)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 16
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(連打部分6)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 18
+trigger1 = moveguarded
+var(25) = floor(14*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ値加算(フィニッシュ部分)]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 25
+trigger1 = moveguarded
+var(25) = floor(56*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1200, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1200, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 26
+movetype = I
+
+[state 1200, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+ctrl = 1
+value = 0
+
+
+;正拳乱れ突き(連打部分やられ動作)
+[statedef 1250]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+
+[state 1250, やられアニメ]
+type = changeanim
+trigger1 = time = 0
+value = 5011
+
+[state 1250, やられアニメ（戻り）]
+type = changeanim
+trigger1 = anim = 5011
+trigger1 = animtime = 0
+value = 5016
+
+[state 1250, 通常の吹き飛びに戻る]
+type = selfstate
+trigger1 = time = 30
+value = 5000
+
+
+;低空胴回転回し蹴り(弱)
+[statedef 1300]
+type = C
+movetype = A
+physics = C
+anim = 1300
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1300, 座標移動]
+type = posadd
+trigger1 = animelem = 3
+x = 10
+
+[state 1300, 座標移動2]
+type = posadd
+trigger1 = animelem = 4
+x = 10
+
+[state 1300, 速度設定]
+type = velset
+trigger1 = animelem = 4
+x = 3.2
+
+[state 1300, SE1]
+type = playsnd
+trigger1 = animelem = 3
+value = 40,0
+
+[state 1300, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1300, 攻撃判定]
+type = hitdef
+trigger1 = animelemno(0) = 7 && !movecontact && !movereversed
+attr = C,SA
+damage = ceil(84 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(7 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-40
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.4,-6.0
+guard.velocity = -11
+air.velocity = -4.4, -6.0
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1300, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(84*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1300, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1300, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(84*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1300, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1300, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1300, 座標移動3]
+type = posadd
+trigger1 = animelem = 10
+x = 10
+
+[state 1300, 座標移動4]
+type = posadd
+trigger1 = animelem = 11
+x = 10
+
+[state 1300, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;低空胴回転回し蹴り(中)
+[statedef 1301]
+type = C
+movetype = A
+physics = C
+anim = 1300
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1301, 座標移動]
+type = posadd
+trigger1 = animelem = 3
+x = 10
+
+[state 1301, 座標移動2]
+type = posadd
+trigger1 = animelem = 4
+x = 10
+
+[state 1301, 速度設定]
+type = velset
+trigger1 = animelem = 4
+x = 4.6
+
+[state 1301, SE1]
+type = playsnd
+trigger1 = animelem = 3
+value = 40,0
+
+[state 1301, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1301, 攻撃判定]
+type = hitdef
+trigger1 = animelemno(0) = 7 && !movecontact && !movereversed
+attr = C,SA
+damage = ceil(84 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(7 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-40
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.4,-6.0
+guard.velocity = -11
+air.velocity = -4.4, -6.0
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1301, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(84*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1301, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1301, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(84*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1301, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1301, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1301, 座標移動3]
+type = posadd
+trigger1 = animelem = 10
+x = 10
+
+[state 1301, 座標移動4]
+type = posadd
+trigger1 = animelem = 11
+x = 10
+
+[state 1301, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;低空胴回転回し蹴り(強)
+[statedef 1302]
+type = C
+movetype = A
+physics = C
+anim = 1300
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 60*var(40)
+sprpriority = 2
+
+[state 1302, 座標移動]
+type = posadd
+trigger1 = animelem = 3
+x = 10
+
+[state 1302, 座標移動2]
+type = posadd
+trigger1 = animelem = 4
+x = 10
+
+[state 1302, 速度設定]
+type = velset
+trigger1 = animelem = 4
+x = 6.2
+
+[state 1302, SE1]
+type = playsnd
+trigger1 = animelem = 3
+value = 40,0
+
+[state 1302, SE2]
+type = playsnd
+trigger1 = animelem = 4
+value = 3,5
+
+[state 1302, 攻撃判定]
+type = hitdef
+trigger1 = animelemno(0) = 7 && !movecontact && !movereversed
+attr = C,SA
+damage = ceil(84 * (fvar(1)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(7 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 5,Hit
+pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-40
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 1
+fall.recovertime = 32+(4*var(11))
+ground.slidetime = 23
+ground.hittime = 23+(4*var(11))
+ground.velocity = -4.4,-6.0
+guard.velocity = -11
+air.velocity = -4.4, -6.0
+air.hittime = 23+(4*var(11))
+getpower = ifelse(var(10)=0,120,60)*var(40),30*var(40)
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 1302, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(84*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 1302, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 1302, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(84*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 1302, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 1302, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 1302, 座標移動3]
+type = posadd
+trigger1 = animelem = 10
+x = 10
+
+[state 1302, 座標移動4]
+type = posadd
+trigger1 = animelem = 11
+x = 10
+
+[state 1302, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;----|超必殺技|-----------------------------------------------------------------------------------------------
+
+;翼の拳
+[statedef 2000]
+type = S
+movetype = A
+physics = N
+anim = 2000
+juggle = 1
+velset = 0,0
+ctrl = 0
+poweradd = 0
+sprpriority = 2
+
+[state 2000, 残像]
+type = afterimage
+trigger1 = time = 0
+time = 133
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 128,128,128
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 2000, 無敵時間]
+type = nothitby
+trigger1 = time = 0
+value = SCA,AA,AT,AP
+time = 39
+
+[state 2000, 背景暗転]
+type = envcolor
+trigger1 = time = 4
+value = 0,0,0
+time = 30
+under = 1
+
+[state 2000, エフェクト]
+type = explod
+trigger1 = time = 4
+anim = 8500
+pos = -20,-50
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = -3
+ownpal = 1
+
+[state 2000, POWMAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = life > lifemax*0.35
+trigger1 = time = 0
+var(20) = 0
+
+[state 2000, パワー消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 2000, 画面暗転・時間停止]
+type = superpause
+trigger1 = time = 4
+Time = 33
+Anim = -1
+Sound = s8500,0
+MoveTime = 33
+Darken = 0
+P2DefMul = 1
+PowerAdd = 0
+UnHittable = 0
+
+[state 2000, SE1]
+type = playsnd
+trigger1 = animelem = 4
+value = 100,3
+
+[state 2000, SE2]
+type = playsnd
+trigger1 = animelem = 7
+value = 3,5
+
+[state 2000, エフェクト1（バックファイア）]
+type = explod
+trigger1 = animelem = 4
+anim = 7030
+ID = 7030
+pos = -28,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 2000, エフェクト2（翼）]
+type = explod
+trigger1 = animelem = 7
+anim = 7010
+ID = 7010
+pos = 55,-62
+postype = P1
+vel = 0,0
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 2000, エフェクト3（閃光）]
+type = explod
+trigger1 = animelem = 5
+anim = 7020
+ID = 7020
+pos = 0,-60
+postype = P1
+vel = 1.0,0
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 2000, 突進速度]
+type = velset
+trigger1 = animelem = 5
+x = 16.0
+
+[state 2000, 突進停止]
+type = velset
+trigger1 = animelem = 7
+x = 0
+
+[state 2000, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 7 && !movecontact && !movereversed
+attr = S,HA
+damage = ceil(245 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(20 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 15,45
+guard.pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = Low
+air.type = Low
+fall = 1
+fall.recover = 0
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -6.0,-6.0
+guard.velocity = -11
+air.velocity = -6.0, -6.0
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2000, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(245*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2000, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 2000, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(245*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2000, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 2000, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 2000, キメポーズへ移行]
+type = changestate
+trigger1 = movehit
+trigger1 = animelem = 17
+value = 2010
+
+[state 2000, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+;ヒット時のキメポーズ
+[statedef 2010]
+type = S
+movetype = I
+physics = S
+anim = 2010
+velset = 0,0
+ctrl = 0
+poweradd = 0
+sprpriority = 2
+
+[state 2010, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;真空五段撃
+[statedef 2100]
+type = S
+movetype = A
+physics = N
+anim = 2100
+juggle = 0
+velset = 0,0
+ctrl = 0
+poweradd = 0
+sprpriority = 2
+
+[state 2100, 残像]
+type = afterimage
+trigger1 = time = 0
+time = 133
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 128,128,128
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 2100, 無敵時間]
+type = nothitby
+trigger1 = time = 0
+value = SCA,AA,AT,AP
+time = 39
+
+[state 2100, 背景暗転]
+type = envcolor
+trigger1 = time = 4
+value = 0,0,0
+time = 32
+under = 1
+
+[state 2100, エフェクト]
+type = explod
+trigger1 = time = 4
+anim = 8500
+pos = 0,-68
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = -3
+ownpal = 1
+
+[state 2100, POWMAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = life > lifemax*0.35
+trigger1 = time = 0
+var(20) = 0
+
+[state 2100, パワー消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -1000
+
+[state 2100, 画面暗転・時間停止]
+type = superpause
+trigger1 = time = 4
+Time = 35
+Anim = -1
+Sound = s8500,0
+MoveTime = 35
+Darken = 0
+P2DefMul = 1
+PowerAdd = 0
+UnHittable = 0
+
+[state 2100, SE1]
+type = playsnd
+trigger1 = animelem = 6
+value = 40,1
+
+[state 2100, SE2]
+type = playsnd
+trigger1 = animelem = 8
+value = 3,5
+
+[state 2100, エフェクト（バックファイア）]
+type = explod
+trigger1 = animelem = 6
+anim = 7030
+ID = 7030
+pos = 0,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 2100, 空中判定へ移行]
+type = statetypeset
+trigger1 = animelem = 6
+statetype = A
+physics = N
+
+[state 2100, 速度設定]
+type = velset
+trigger1 = animelem = 7
+x = 5.5
+y = -8.0
+
+[state 2100, 重力]
+type = veladd
+trigger1 = animelemtime(7) > 0
+y = 0.56
+
+[state 2100, 攻撃判定]
+type = hitdef
+trigger1 = (animelemno(0) = [10,11]) && !movecontact && !movereversed
+attr = A,HA
+damage = ceil(112 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 40,39
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 0
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -1.6,-6.2
+guard.velocity = -11
+air.velocity = -1.6,-5.4
+airguard.velocity = -6.8, -1
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2100, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(98*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2100, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(98*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2100, ヒット時に乱舞に移行]
+type = changestate
+trigger1 = movehit
+value = 2110
+
+[state 2100, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 2100, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 12
+movetype = I
+
+[state 2100, 着地]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 2190
+
+;真空五段撃(乱舞)
+[statedef 2110]
+type = A
+movetype = A
+physics = S
+ctrl = 0
+
+[state 2110, 接触判定拡大]
+type = width
+trigger1 = 1
+value = 25,0
+
+[state 2110, 重力]
+type = velset
+trigger1 = anim = 2100
+trigger1 = animelemtime(10) >= 0 && animelemtime(12) < 0
+trigger2 = anim = 2110
+trigger2 = animelemtime(1) >= 0 && animelemtime(2) < 0
+y = -0.56
+
+[state 2110, アニメ変更]
+type = changeanim
+trigger1 = anim = 2100
+trigger1 = animelem = 12
+value = 2110
+
+[state 2110, physics変更]
+type = statetypeset
+trigger1 = anim = 2110
+trigger1 = animelem = 2
+physics = N
+
+[state 2110, 速度変更]
+type = velset
+trigger1 = anim = 2110
+trigger1 = animelem = 2
+x = 1.6
+y = -0.5
+
+[state 2110, SE1]
+type = playsnd
+trigger1 = animelem = 3
+value = 3,4
+
+[state 2110, SE2]
+type = playsnd
+trigger1 = animelem = 7
+value = 3,3
+
+[state 2110, SE3]
+type = playsnd
+trigger1 = animelem = 13
+value = 3,5
+
+[state 2110, SE4]
+type = playsnd
+trigger1 = animelem = 18
+value = 3,4
+
+[state 2110, 攻撃判定接触リセット]
+type = movehitreset
+trigger1 = animelem = 6
+trigger2 = animelem = 10
+trigger3 = animelem = 17
+
+[state 2110, 攻撃判定]
+type = hitdef
+trigger1 = animelemno(0) = 4 && !movecontact && !movereversed
+attr = A,HA
+damage = ceil(28 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 10,19
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 0
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -1.6,-4.2
+guard.velocity = -11
+air.velocity = -1.6,-4.2
+airguard.velocity = -2.0, -1.0
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2110, 攻撃判定2]
+type = hitdef
+trigger1 = animelemno(0) = 8 && !movecontact && !movereversed
+attr = A,HA
+damage = ceil(28 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 10,19
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 0
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -1.6,-4.2
+guard.velocity = -11
+air.velocity = -1.6,-4.2
+airguard.velocity = -2.0, -1.0
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2110, 攻撃判定3]
+type = hitdef
+trigger1 = animelemno(0) = 15 && !movecontact && !movereversed
+attr = A,HA
+damage = ceil(28 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 10,19
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 0
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -1.6,0
+guard.velocity = -11
+air.velocity = -1.6,0
+airguard.velocity = -2.0, -1.0
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2110, 速度変更2]
+type = velset
+trigger1 = anim = 2110
+trigger1 = animelem = 18
+x = 0
+y = 0
+
+[state 2110, 攻撃判定4]
+type = hitdef
+trigger1 = animelemno(0) = 19 && !movecontact && !movereversed
+attr = A,HA
+damage = ceil(35 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(9 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 30,29
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-65
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = High
+air.type = High
+fall = 1
+fall.recover = 0
+fall.recovertime = 36+(4*var(11))
+ground.slidetime = 27
+ground.hittime = 27+(4*var(11))
+ground.velocity = -4.5,8.0
+guard.velocity = -11
+air.velocity = -4.5,8.0
+airguard.velocity = -2.0, -1
+air.hittime = 27+(4*var(11))
+getpower = 0,0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 2110, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 4
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, 気絶値加算2]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 8
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, 気絶値加算3]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 15
+trigger1 = movehit
+var(22) = floor(28*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, 気絶値加算4]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = animelemno(0) = 19
+trigger1 = movehit
+var(22) = floor(35*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+triggerall = animelemtime(19) >= 0
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 2110, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 4
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, ガードクラッシュ値加算2]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 8
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, ガードクラッシュ値加算3]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 15
+trigger1 = moveguarded
+var(25) = floor(28*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, ガードクラッシュ値加算4]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = animelemno(0) = 19
+trigger1 = moveguarded
+var(25) = floor(35*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 2110, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 2110, 重力2]
+type = veladd
+trigger1 = anim = 2110
+trigger1 = animelemtime(24) >= 0
+y = 0.47
+
+[state 2110, 着地]
+type = changestate
+trigger1 = anim = 2110
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 2190
+
+
+;真空五段撃(着地)
+[statedef 2190]
+type = S
+movetype = I
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 57
+sprpriority = 2
+
+[state 2190, 座標調整]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 2190, SE]
+type = playsnd
+trigger1 = time = 0
+value = 52,0
+
+[state 2190, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+
+;----|潜在能力|-----------------------------------------------------------------------------------------------
+
+;翼の拳
+[statedef 3000]
+type = S
+movetype = A
+physics = N
+anim = 2000
+juggle = 1
+velset = 0,0
+ctrl = 0
+poweradd = 0
+sprpriority = 2
+
+[state 3000, 残像]
+type = afterimage
+trigger1 = time = 0
+time = 133
+length = 8
+timegap = 1
+framegap = 2
+PalBright = 1,1,1
+PalContrast = 240,60,60
+PalAdd = 0,0,0
+PalMul = .5,.5,.5
+trans = add1
+
+[state 3000, 無敵時間]
+type = nothitby
+trigger1 = time = 0
+value = SCA,AA,AT,AP
+time = 51
+
+[state 3000, 背景暗転]
+type = envcolor
+trigger1 = time = 4
+value = 0,0,0
+time = 30
+under = 1
+
+[state 3000, エフェクト]
+type = explod
+trigger1 = time = 4
+anim = 8500
+pos = -20,-50
+postype = P1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = -3
+ownpal = 1
+
+[state 3000, POWMAX終了]
+type = varset
+trigger1 = var(40) = 0
+trigger1 = time = 0
+var(20) = 0
+
+[state 3000, パワー消費]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = time = 0
+value = -3000
+
+[state 3000, 画面暗転・時間停止]
+type = superpause
+trigger1 = time = 4
+Time = 37
+Anim = -1
+Sound = s8500,0
+MoveTime = 37
+Darken = 0
+P2DefMul = 1
+PowerAdd = 0
+UnHittable = 0
+
+[state 3000, 暗転時の相手のガード状態]
+type = varset
+trigger1 = time = 4
+trigger1 = P2stateno = 120 || (P2stateno = [130,132]) || (P2stateno = [150,155])
+var(16) = 1
+
+[state 3000,暗転終了時の相手のガード可能状態回復]
+type = varset
+trigger1 = time = 41
+var(16) = 0
+
+[state 3000, 暗転後のガード不能]
+type = assertspecial
+trigger1 = time <= 40 && var(16) = 0
+flag = unguardable
+
+[state 3000, SE1]
+type = playsnd
+trigger1 = animelem = 4
+value = 100,3
+
+[state 3000, SE2]
+type = playsnd
+trigger1 = animelem = 7
+value = 3,5
+
+[state 3000, エフェクト1（バックファイア）]
+type = explod
+trigger1 = animelem = 4
+anim = 7030
+ID = 7030
+pos = -28,0
+postype = P1
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 3000, エフェクト2（翼）]
+type = explod
+trigger1 = animelem = 7
+anim = 7010
+ID = 7010
+pos = 55,-62
+postype = P1
+vel = 0,0
+facing = 1
+vfacing = 1
+scale = 0.75,0.75
+sprpriority = 3
+ownpal = 1
+
+[state 3000, エフェクト3（閃光）]
+type = explod
+trigger1 = animelem = 5
+anim = 7020
+ID = 7020
+pos = 0,-60
+postype = P1
+vel = 1.0,0
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 3
+ownpal = 1
+
+[state 3000, 突進速度]
+type = velset
+trigger1 = animelem = 5
+x = 24.0
+
+[state 3000, 突進停止]
+type = velset
+trigger1 = animelem = 7
+x = 0
+
+[state 3000, 攻撃判定]
+type = HitDef
+trigger1 = AnimElemNo(0) = 7 && !movecontact && !movereversed
+attr = S,HA
+damage = ceil(500 * (fvar(0)*fvar(2)*fvar(3)*fvar(4)*fvar(6))), ceil(50 * (fvar(3)*fvar(4)*fvar(6)))
+guardflag = HL
+hitflag = HLAF
+priority = 6,Hit
+pausetime = 15,45
+guard.pausetime = 10,9
+sparkno = s8202
+guard.sparkno = s8101
+sparkxy = -10,-60
+hitsound = s2,5
+guardsound = s1,1
+animtype = back
+ground.type = Low
+air.type = Low
+fall = 1
+fall.recover = 0
+ground.slidetime = 35
+ground.hittime = 35+(4*var(11))
+ground.velocity = -8.0,-6.8
+guard.velocity = -11
+air.velocity = -8.0, -6.8
+air.hittime = 35+(4*var(11))
+getpower = 0
+givepower = 30,30
+yaccel = 0.47
+fall.yvelocity = -4.5
+
+[state 3000, 気絶値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+trigger1 = movehit
+var(22) = floor(450*fvar(9)*0.1)
+ignorehitpause = 1
+persistent = 0
+
+[state 3000, 気絶]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(2) = 1
+triggerall = numtarget
+trigger1 = var(22) >= ceil(enemy,const(data.life)*0.05)+var(24)*10
+trigger1 = movehit
+trigger1 = target,alive
+persistent = 0
+value = 5296
+
+[state 3000, ガードクラッシュ値加算]
+type = varadd
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+trigger1 = moveguarded
+var(25) = floor(300*fvar(7)*fvar(8))
+ignorehitpause = 1
+persistent = 0
+
+[state 3000, ガードクラッシュ]
+type = targetstate
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numtarget
+trigger1 = var(25) >= ceil(0.007*enemy,lifemax*enemy,const(data.defence))
+trigger1 = moveguarded
+ignorehitpause = 1
+persistent = 0
+value = ifelse(target,statetype=A,5930,ifelse(target,statetype=C,5920,5910))
+
+[state 3000, キメポーズへ移行]
+type = changestate
+trigger1 = movehit
+trigger1 = animelem = 17
+value = 2010
+
+[state 3000, フォロースルー]
+type = statetypeset
+trigger1 = animelem = 8
+movetype = I
+
+[state 3000, 動作終了]
+type = changestate
+trigger1 = animtime = 0
+value = 0
+ctrl = 1
+
+
+;----|眩暈(スタン)|-------------------------------------------------------------------------------------------
+
+;気絶吹き飛び
+[statedef 5296]
+type = A
+movetype = H
+physics = N
+velset = 0,0
+ctrl = 0
+anim = 5030
+
+[state 5296, 体力0以下ならKOへ移行]
+type = selfstate
+trigger1 = life <= 0
+value = 5050
+
+[state 5296, ダウン属性無効化]
+type = hitfallset
+trigger1 = time = 0
+value = 0
+xvel = 0
+yvel = 0
+
+[state 5296, 無敵化]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 5296, 接触判定消失]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 5296, 吹き飛び速度]
+type = velset
+trigger1 = time = 0
+x = ifelse(P2dist X >0,-4.2,4.2)
+y = -6.2
+
+[state 5296, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 5296, 吹き飛びアニメ]
+type = changeanim
+triggerall = selfanimexist(5035) = 1
+trigger1 = anim = 5030 && animtime = 0
+trigger2 = anim = 5030 && animelemtime(1) >= 1 && vel Y >-2
+value = 5035
+
+[state 5296, 吹き飛びアニメ(落下)]
+type = changeanim
+trigger1 = selfanimexist(5035) = 0 && anim = 5030 && animtime = 0
+trigger2 = anim = 5035 && animtime = 0
+trigger3 = anim = 5035 && vel Y > 0 && pos Y >= 10
+value = 5050
+
+[state 5296, 吹き飛びアニメ(落下2)]
+type = changeanim
+trigger1 = selfanimexist(5060) = 1
+trigger1 = anim = 5050
+trigger1 = vel Y >= 2
+value = 5060
+
+[state 5296, バウンドへ移行]
+type = changestate
+trigger1 = time > 1
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 5297
+
+;気絶吹き飛び(着地)
+[statedef 5297]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+anim = 5100
+
+[state 5297, 無敵化]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 5297, 接触判定消失]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 5297, 速度リセット]
+type = velset
+trigger1 = time = 0
+y = 0
+
+[state 5297, バウンド速度設定(x)]
+type = velmul
+trigger1 = time = 0
+x = 0.76
+
+[state 5297, バウンド速度設定(y)]
+type = velset
+trigger1 = animtime = 0
+y = -4.6
+
+[state 5297, バウンド移行]
+type = changestate
+trigger1 = animtime = 0
+value = 5298
+
+;気絶吹き飛び(バウンド)
+[statedef 5298]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+
+[state 5296, 無敵化]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 5296, 接触判定消失]
+type = playerpush
+trigger1 = 1
+value = 0
+
+[state 5298, 重力]
+type = veladd
+trigger1 = 1
+y = 0.47
+
+[state 5298, アニメ変更]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5160),5160,5080)
+
+[state 5298, 着地動作]
+type = changestate
+trigger1 = time > 1
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 5299
+
+;気絶吹き飛び(ダウン移行)
+[statedef 5299]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+
+[state 5299, 無敵化]
+type = nothitby
+trigger1 = 1
+value = SCA,AA,AT,AP
+
+[state 5299, 位置調整]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 5299, 速度リセット]
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 5299, 叩きつけられモーション]
+type = changeanim
+trigger1 = time = 0
+value = 5170
+
+[state 5299, ダウン状態]
+type = changeanim
+trigger1 = anim = 5170 && animtime = 0
+value = 5110
+
+[state 5299, 起き上がり]
+type = changeanim
+trigger1 = anim = 5110 && time >= 30
+value = 5120
+
+[state 5299, 起き上がり～朦朧状態]
+type = changestate
+trigger1 = anim = 5120 && animtime = 0
+value = 5300
+
+;朦朧状態
+[statedef 5300]
+type = S
+movetype = H
+physics = S
+velset = 0,0
+ctrl = 0
+anim = 5300
+
+[state 5300, 位置調節]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 5300, 眩暈復帰]
+type = changestate
+trigger1 = time = 800
+trigger2 = time > 0 && enemy,var(21) <= 0
+value = 5301
+
+;気絶動作終了
+[statedef 5301]
+type = S
+
+[state 5301, 気絶動作終了]
+type = selfstate
+trigger1 = time = 0
+value = 0
+ctrl = 1
+
+
+;----|ガードクラッシュ|-------------------------------------------------------------------------------
+
+;立ちガードクラッシュ
+[statedef 5910]
+type = S
+movetype = H
+ctrl = 0
+
+[state 5910, 体力0以下ならKOへ移行]
+type = selfstate
+trigger1 = life <= 0
+value = 5050
+
+[state 5910, ガードクラッシュアニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5910),5910,5002)
+
+[state 5910, 速度]
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 5910, 位置調節]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 5910, クラッシュ動作継続]
+type = changeanim
+trigger1 = anim = 5002
+trigger1 = animtime = 0
+value = 5002
+elem = animelemno(-1)
+
+[state 5910, クラッシュ(のけぞり)に移行]
+type = changestate
+trigger1 = hitshakeover
+value = 5911
+
+[statedef 5911]
+type = S
+movetype = H
+ctrl = 0
+
+[state 5911, クラッシュ動作継続]
+type = changeanim
+trigger1 = anim = 5002
+trigger1 = animtime = 0
+value = 5002
+elem = animelemno(-1)
+
+[state 5911, クラッシュ(戻り)に移行]
+type = changestate
+trigger1 = time = 47
+value = 5912
+
+;立ちガードクラッシュ(戻り)
+[statedef 5912]
+type = S
+movetype = H
+ctrl = 0
+
+[state 5912, クラッシュ戻りアニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5911),5911,5007)
+
+[state 5912, 動作終了]
+type = selfstate
+trigger1 = animtime = 0
+trigger2 = time = 13
+value = 0
+ctrl = 1
+
+;しゃがみガードクラッシュ
+[statedef 5920]
+type = C
+movetype = H
+ctrl = 0
+
+[state 5920, 体力0以下ならKOへ移行]
+type = selfstate
+trigger1 = life <= 0
+value = 5050
+
+[state 5920, クラッシュアニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5920),5920,5022)
+
+[state 5920, 速度]
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 5920, 位置調節]
+type = posset
+trigger1 = time = 0
+y = 0
+
+[state 5920, クラッシュ動作継続]
+type = changeanim
+trigger1 = anim = 5022
+trigger1 = animtime = 0
+value = 5022
+elem = animelemno(-1)
+
+[state 5920, クラッシュ(のけぞり)に移行]
+type = changestate
+trigger1 = hitshakeover
+value = 5921
+
+[statedef 5921]
+type = C
+movetype = H
+ctrl = 0
+
+[state 5921, クラッシュ動作継続]
+type = changeanim
+trigger1 = anim = 5022
+trigger1 = animtime = 0
+value = 5022
+elem = animelemno(-1)
+
+[state 5921, クラッシュ(戻り)に移行]
+type = changestate
+trigger1 = time = 47
+value = 5922
+
+;しゃがみガードクラッシュ(戻り)
+[statedef 5922]
+type = C
+movetype = H
+ctrl = 0
+
+[state 5922, クラッシュ戻りアニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5921),5921,5027)
+
+[state 5922, 動作終了]
+type = selfstate
+trigger1 = animtime = 0
+trigger2 = time = 13
+value = 11
+ctrl = 1
+
+;空中ガードクラッシュ
+[statedef 5930]
+type = A
+movetype = H
+physics = N
+ctrl = 0
+
+[state 5930, 体力0以下ならKOへ移行]
+type = selfstate
+trigger1 = life <= 0
+value = 5050
+
+[state 5930, クラッシュアニメ]
+type = changeanim
+trigger1 = time = 0
+value = ifelse(selfanimexist(5930),5930,5022)
+
+[state 5930, 速度リセット]
+type = velset
+trigger1 = time = 0
+x = 0
+y = 0
+
+[state 5930, 速度取得]
+type = hitvelset
+trigger1 = hitshakeover
+persistent = 0
+x = 1
+y = 1
+
+[state 5930, 重力]
+type = gravity
+trigger1 = hitshakeover
+
+[state 5930, クラッシュアニメ継続]
+type = changeanim
+trigger1 = anim = 5022
+trigger1 = animtime = 0
+value = 5022
+elem = animelemno(-1)
+
+[state 5930, 着地したらしゃがみガードクラッシュに移行]
+type = changestate
+trigger1 = vel Y > 0
+trigger1 = pos Y >= 0
+value = 5920
+
+
+;----|ヘルパー|---------------------------------------------------------------------------------------
+
+;イントロ継続ヘルパー
+[statedef 9000]
+type = S
+anim = 9999
+
+[state 9000, 自壊タイマーセット]
+type = varset
+trigger1 = time = 0
+var(0) = 300
+
+[state 9000, 自壊タイマーカウントダウン]
+type = varadd
+trigger1 = 1
+var(0) = -1
+
+[state 9000, イントロ継続命令]
+type = assertspecial
+trigger1 = 1
+flag = intro
+
+[state 9000, 自壊]
+type = destroyself
+trigger1 = time > 0 && var(0) = 0
+trigger2 = root,var(41) = 1

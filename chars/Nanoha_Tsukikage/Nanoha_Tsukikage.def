@@ -1,0 +1,24 @@
+[info]
+name = "Nanoha_Tsukikage"          
+displayname = "Nanoha Tsukikage"   ;月影なのは
+versiondate = 10,16,2018           ;最終更新日
+mugenversion = 12,27,2007          ;win版 mugen plus
+author = "Wani_Shimamura"          ;島村鰐
+Pal.Defaults = 4,5,6,1,2,3
+
+[Files]
+cmd = Nanoha_Tsukikage.cmd
+cns = Nanoha_Tsukikage.cns
+st  = Nanoha_Tsukikage.cns
+st1 = Nanoha_Tsukikage_-2_-3.cns
+stcommon = Nanoha_Tsukikage_common.cns
+sprite = Nanoha_Tsukikage.sff
+anim = Nanoha_Tsukikage.air
+sound = Nanoha_Tsukikage.snd
+pal1 = Nanoha_Tsukikage04.act
+pal2 = Nanoha_Tsukikage05.act
+pal3 = Nanoha_Tsukikage06.act
+pal4 = Nanoha_Tsukikage01.act
+pal5 = Nanoha_Tsukikage02.act
+pal6 = Nanoha_Tsukikage03.act
+

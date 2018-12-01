@@ -1,0 +1,27 @@
+iframe {
+    display: block;
+    margin: 0 auto;
+    width: 720px;
+    height: 540px;
+    overflow: hidden;
+    border: 1px solid #000;
+}
+
+.github-link {
+    display: flex;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    height: 100px;
+    z-index: 999;
+    text-decoration: none;
+}
+
+.github-link > p.balloon {
+  align-self: flex-start;
+  padding: 0.2rem 0.5rem;
+}
+
+.github-link > i.octocat {
+  align-self: flex-end;
+}

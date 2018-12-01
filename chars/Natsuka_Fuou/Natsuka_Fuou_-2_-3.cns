@@ -1,0 +1,1131 @@
+[Statedef -2]
+
+;------|ガード硬直中の投げ無敵|--------------------------------------------------
+
+;投げ無敵設定スイッチ
+[state -2, 投げ無敵設定スイッチ]
+type = varset
+trigger1 = 1
+var(1) = 1
+
+;0 : ガード硬直中およびガード硬直から復帰した直後にも投げられ判定があります(デフォルトのcommon1と同じ)
+;1 : ガード硬直中およびガード硬直から復帰した直後に投げ無敵になります
+
+;------|気絶の有無|--------------------------------------------------------------
+
+;気絶設定スイッチ
+[state -2, 気絶の有無]
+type = varset
+trigger1 = 1
+var(2) = 1
+
+;0 : 気絶システム無し、相手は気絶しません
+;1 : 気絶システム有り、連続で攻撃を当てていくと相手が気絶(眩暈)します
+
+;------|ガードクラッシュの有無|--------------------------------------------------
+
+;ガードクラッシュ設定スイッチ
+[state -2, ガードクラッシュの有無]
+type = varset
+trigger1 = 1
+var(3) = 1
+
+;0 :ガードクラッシュ無し
+;1 :ガードクラッシュ有り、連続で攻撃をガードさせると相手のガードが崩れます
+
+;------|ガード硬直中の投げ無敵設定|----------------------------------------------
+
+[state -2, 投げ無敵時間(自分)カウントセット]
+type = varset
+triggerall = var(1) = 1
+trigger1 = (stateno = [150,155]) ||stateno = 5120 
+var(5) = 5
+ignorehitpause = 1
+
+[state -2, 投げ無敵時間(自分)リセット]
+type = varset
+triggerall = var(1) = 1
+triggerall = var(5) != 0
+triggerall = (stateno != [150,155]) && stateno != 5120
+trigger1 = stateno != 0 && (stateno != [10,12]) && stateno != 20
+trigger1 = stateno != 120 && (stateno != [130,132]) && stateno != 140
+var(5) = 0
+ignorehitpause = 1
+
+[state -2, 投げ無敵時間(自分)カウントダウン]
+type = varadd
+triggerall = var(1) = 1
+triggerall = var(5) > 0
+trigger1 = (stateno != [150,155]) && stateno != 5120
+var(5) = -1
+
+[state -2, 投げ無敵時間設定]
+type = nothitby
+trigger1 = var(5) > 0
+value = ,AT
+
+[state -2, 投げ無敵時間(相手)カウントセット]
+type = varset
+triggerall = var(1) = 1
+trigger1 = (P2stateno = [150,155]) ||P2stateno = 5120 
+var(6) = 5
+ignorehitpause = 1
+
+[state -2, 投げ無敵時間(相手)リセット]
+type = varset
+triggerall = var(1) = 1
+triggerall = var(6) != 0
+triggerall = (P2stateno != [150,155]) && P2stateno != 5120
+trigger1 = P2stateno != 0 && (P2stateno != [10,12]) && P2stateno != 20
+trigger1 = P2stateno != 120 && (P2stateno != [130,132]) && P2stateno != 140
+var(6) = 0
+ignorehitpause = 1
+
+[state -2, 投げ無敵時間(相手)カウントダウン]
+type = varadd
+triggerall = var(1) = 1
+triggerall = var(6) > 0
+trigger1 = (P2stateno != [150,155]) && P2stateno != 5120
+var(6) = -1
+
+;------|投げ抜け可否判定|--------------------------------------------------------
+
+[state -2, 投げ抜け不可状態認識リセット]
+type = varset
+triggerall = var(7) != 0
+trigger1 = P2stateno = 0 || (P2stateno = [10,12]) || P2stateno = 20
+trigger2 = P2stateno = 120 || (P2stateno = [130,132]) || P2stateno = 140
+var(7) = 0
+
+[state -2, 投げ抜け不可状態認識]
+type = varset
+triggerall = var(7) = 0
+trigger1 = P2stateno != 0 && (P2stateno != [10,12]) && P2stateno != 20
+trigger1 = P2stateno != 120 && (P2stateno != [130,132]) && P2stateno != 140
+trigger1 = P2stateno != 705 && P2stateno != 715
+var(7) = 1
+
+
+;------|ダメージ補正値関係|------------------------------------------------------
+
+;コンボ補正
+[state -2, ヒット数カウント]
+type = varadd
+trigger1 = movehit = 1
+trigger2 = projhit = 1
+trigger3 = numhelper(7200)
+trigger3 = helper(7200),var(23)
+var(10) = 1
+
+[state -2, ヒット数リセット]
+type = varset
+triggerall = var(10) != 0
+trigger1 = P2movetype != H
+var(10) = 0
+
+[state -2, コンボ補正値(超必殺技用)]
+type = varset
+trigger1 = var(10) >= 5 && var(10) <= 8
+fvar(0) = 0.8**(var(10)-4)
+
+[state -2, コンボ補正値(超必殺技用)2]
+type = varset
+trigger1 = var(10) >= 9
+fvar(0) = 0.4
+
+[state -2, コンボ補正値(超必殺技用)リセット]
+type = varset
+trigger1 = fvar(0) != 1
+trigger1 = P2movetype != H
+trigger2 = var(10) <= 4
+fvar(0) = 1.0
+
+[state -2, コンボ補正値]
+type = varset
+trigger1 = var(10) >= 5 && var(10) <= 14
+fvar(1) = 0.8**(var(10)-4)
+
+[state -2, コンボ補正値2]
+type = varset
+trigger1 = var(10) >= 15
+fvar(1) = 0.1
+
+[state -2, コンボ補正値リセット]
+type = varset
+trigger1 = fvar(1) != 1
+trigger1 = P2movetype != H
+trigger2 = var(10) <= 4
+fvar(1) = 1.0
+
+;カウンターヒット補正
+[state -2, カウンターヒット認識]
+type = varset
+trigger1 = P2movetype = A
+var(11) = 2
+
+[state -2, カウンターヒット認識リセット]
+type = varadd
+triggerall = var(11) > 0
+trigger1 = ctrl
+trigger2 = numenemy
+trigger2 = enemynear,ctrl
+trigger3 = P2movetype != A
+trigger4 = var(10) != 0
+var(11) = -1
+
+[state -2, カウンターヒット認識(気絶値用)]
+type = varset
+trigger1 = var(11) > 0
+var(18) = 1
+
+[state -2, カウンターヒット認識リセット(気絶値用)]
+type = varset
+trigger1 = var(11) = 0
+var(18) = 0
+
+[state -2, カウンターヒット補正値]
+type = varset
+trigger1 = var(11) = 2
+fvar(2) = 1.2
+
+[state -2, カウンターヒット補正値リセット]
+type = varset
+triggerall = fvar(2) != 1
+trigger1 = var(11) <= 1
+fvar(2) = 1.0
+
+[state -2, カウンターヒット補正値(気絶値用)]
+type = varset
+trigger1 = var(18) = 1
+fvar(9) = 1.2
+
+[state -2, カウンターヒット補正値リセット(気絶値用)]
+type = varset
+triggerall = fvar(9) != 1
+trigger1 = var(18) = 0
+fvar(9) = 1.0
+
+;残体力補正(自分)
+[state -2, 残体力判定(自分)、体力30％超]
+type = varset
+trigger1 = life > lifemax*0.3
+var(13) = 0
+
+[state -2, 残体力判定(自分)、体力15％～30％]
+type = varset
+trigger1 = life > lifemax*0.15 && life <= lifemax*0.3
+var(13) = 1
+
+[state -2, 残体力判定(自分)、体力15％以下]
+type = varset
+trigger1 = life <= lifemax*0.15
+var(13) = 2
+
+[state -2, 残体力補正値(自分)]
+type = varset
+trigger1 = var(13) = 0
+fvar(3) = 1.0
+
+[state -2, 残体力補正値(自分)]
+type = varset
+trigger1 = var(13) = 1
+fvar(3) = 1.05
+
+[state -2, 残体力補正値(自分)]
+type = varset
+trigger1 = var(13) = 2
+fvar(3) = 1.1
+
+;残体力補正(相手)
+[state -2, 残体力判定(相手)]
+type = varset
+trigger1 = numenemy
+trigger1 = P2life > enemy,lifemax*0.3
+var(14) = 0
+
+[state -2, 残体力判定(相手)]
+type = varset
+trigger1 = numenemy
+trigger1 = P2life > enemy,lifemax*0.15 && P2life <= enemy,lifemax*0.3
+var(14) = 1
+
+[state -2, 残体力判定(相手)]
+type = varset
+trigger1 = numenemy
+trigger1 = P2life <= enemy,lifemax*0.15
+var(14) = 2
+
+[state -2, 残体力補正値(相手)]
+type = varset
+trigger1 = var(14) = 0
+fvar(4) = 1.0
+
+[state -2, 残体力補正値(相手)]
+type = varset
+trigger1 = var(14) = 1
+fvar(4) = 0.9
+
+[state -2, 残体力補正値(相手)]
+type = varset
+trigger1 = var(14) = 2
+fvar(4) = 0.75
+
+;投げダメージ用ATK補正
+[state -2, 投げダメージ用ATK補正値]
+type = varset
+trigger1 = 1
+fvar(5) = 0.01*const(data.attack)
+
+;ゲージによるダメージ補正
+[state -2, EXゲージPOW.MAX攻撃力補正]
+type = varset
+trigger1 = var(40) = 0 && var(41) = 1
+trigger1 = var(20) = 0
+fvar(6) = 1.0
+
+[state -2, EXゲージPOW.MAX攻撃力補正]
+type = varset
+trigger1 = var(40) = 0 && var(41) = 1
+trigger1 = var(20) > 0
+fvar(6) = 1.20
+
+[state -2, ADVゲージ蓄積攻撃力補正]
+type = varset
+trigger1 = var(40) = 1 && var(41) = 1
+trigger1 = power >= 0 && power < 1000
+fvar(6) = 1.0
+
+[state -2, ADVゲージ蓄積攻撃力補正]
+type = varset
+trigger1 = var(40) = 1 && var(41) = 1
+trigger1 = power >= 1000 && power < 2000
+fvar(6) = 1.01
+
+[state -2, ADVゲージ蓄積攻撃力補正]
+type = varset
+trigger1 = var(40) = 1 && var(41) = 1
+trigger1 = power >= 2000 && power < 3000
+fvar(6) = 1.02
+
+[state -2, ADVゲージ蓄積攻撃力補正]
+type = varset
+trigger1 = var(40) = 1 && var(41) = 1
+trigger1 = power >= 3000
+fvar(6) = 1.05
+
+;ガードクラッシュ用補正値
+[state -2, 連続ガードカウント]
+type = varadd
+trigger1 = moveguarded = 1
+trigger2 = projguarded = 1
+trigger3 = numhelper(7200)
+trigger3 = helper(7200),var(27) = 1
+var(12) = 1
+
+[state -2, 連続ガードカウントリセット]
+type = varset
+triggerall = var(12) != 0
+trigger1 = P2movetype != H
+var(12) = 0
+
+[state -2, ガードクラッシュ値連続ガード補正]
+type = varset
+trigger1 = var(12) >= 10 && var(12) <= 19
+fvar(7) = 0.8**(var(12)-9)
+
+[state -2, ガードクラッシュ値連続ガード補正2]
+type = varset
+trigger1 = var(12) >= 20
+fvar(7) = 0.1
+
+[state -2, ガードクラッシュ値連続ガード補正値リセット]
+type = varset
+trigger1 = fvar(7) != 1
+trigger1 = P2movetype != H
+trigger2 = var(12) <= 9
+fvar(7) = 1.0
+
+[state -2, 相手の状態確認]
+type = varset
+trigger1 = P2statetype = S
+trigger2 = P2statetype = L
+var(15) = 0
+
+[state -2, 相手の状態確認]
+type = varset
+trigger1 = P2statetype = C
+var(15) = 1
+
+[state -2, 相手の状態確認]
+type = varset
+trigger1 = P2statetype = A
+var(15) = 2
+
+[state -2, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = var(15) = 0
+fvar(8) = 1.0
+
+[state -2, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = var(15) = 1
+fvar(8) = 1.2
+
+[state -2, ガードクラッシュ値状態補正]
+type = varset
+trigger1 = var(15) = 2
+fvar(8) = 1.8
+
+
+;----|ガードキャンセルフラグリセット|----------------------------------------------------------
+
+[state -2, ガードキャンセルフラグ変数のリセット]
+type = varset
+trigger1 = var(9) != 0
+trigger1 = stateno != [150,155]
+var(9) = 0
+
+
+;----|ゲージの表示|----------------------------------------------------------------------------
+
+;EXパワーゲージ
+[state -2, EXパワーゲージ(中身)表示]
+type = explod
+triggerall = numexplod(6010) = 0
+trigger1 = var(40) = 0 && var(41) = 1
+anim = 6009+teamside
+ID = 6010
+postype = left
+pos = 128+64*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 6
+ownpal = 1
+ontop = 1
+
+[state -2, EXパワーゲージ(中身)長さ指定]
+type = modifyexplod
+trigger1 = numexplod(6010) = 1
+trigger1 = 1
+ID = 6010
+scale = ifelse(power >= 1000,0.5,0.5*power*0.001),0.5
+ignorehitpause = 1
+
+[state -2, EXパワーゲージ(タイマー)表示]
+type = explod
+triggerall = numexplod(6012) = 0
+triggerall = var(40) = 0 && var(41) = 1
+trigger1 = var(20) > 0
+anim = 6011+teamside
+ID = 6012
+postype = left
+pos = 128+64*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 7
+ownpal = 1
+ontop = 1
+
+[state -2, EXパワーゲージ(タイマー)長さ指定]
+type = modifyexplod
+trigger1 = numexplod(6012) = 1
+trigger1 = 1
+ID = 6012
+scale = 0.5*var(20)*0.00115,0.5
+ignorehitpause = 1
+
+[state -2, EXパワーゲージ(枠)表示]
+type = explod
+triggerall = numexplod(6000) = 0
+trigger1 = var(40) = 0 && var(41) = 1
+anim = 5999+teamside
+ID = 6000
+postype = left
+pos = 128+64*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 8
+ownpal = 1
+ontop = 1
+
+;ADVパワーゲージ
+[state -2, ADVパワーゲージ(Lv.1)表示]
+type = explod
+triggerall = numexplod(6020) = 0
+trigger1 = var(40) = 1 && var(41) = 1
+anim = 6019+teamside
+ID = 6020
+postype = left
+pos = 128+64*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 7
+ownpal = 1
+ontop = 1
+
+[state -2, ADVパワーゲージ(Lv.1)長さ指定]
+type = modifyexplod
+trigger1 = numexplod(6020) = 1
+trigger1 = 1
+ID = 6020
+scale = ifelse(power>=1000,0.5,0.5*power*0.001),0.5
+ignorehitpause = 1
+
+[state -2, ADVパワーゲージ(Lv.2)表示]
+type = explod
+triggerall = numexplod(6022) = 0
+trigger1 = var(40) = 1 && var(41) = 1
+anim = 6021+teamside
+ID = 6022
+postype = left
+pos = 92+136*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 7
+ownpal = 1
+ontop = 1
+
+[state -2, ADVパワーゲージ(Lv.2)長さ指定]
+type = modifyexplod
+trigger1 = numexplod(6022) = 1
+trigger1 = 1
+ID = 6022
+scale = ifelse(power>=2000,0.5,ifelse(power>1000,0.5*((power-1000)*0.001),0)),0.5
+ignorehitpause = 1
+
+[state -2, ADVパワーゲージ(Lv.3)表示]
+type = explod
+triggerall = numexplod(6024) = 0
+trigger1 = var(40) = 1 && var(41) = 1
+anim = 6023+teamside
+ID = 6024
+postype = left
+pos = 56+208*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 7
+ownpal = 1
+ontop = 1
+
+[state -2, ADVパワーゲージ(Lv.3)長さ指定]
+type = modifyexplod
+trigger1 = numexplod(6024) = 1
+trigger1 = 1
+ID = 6024
+scale = ifelse(power>=3000,0.5,ifelse(power>2000,0.5*((power-2000)*0.001),0)),0.5
+ignorehitpause = 1
+
+[state -2, ADVパワーゲージ(枠)表示]
+type = explod
+triggerall = numexplod(6002) = 0
+trigger1 = var(40) = 1 && var(41) = 1
+anim = 6001+teamside
+ID = 6002
+postype = left
+pos = 128+64*(teamside-1),225
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 8
+ownpal = 1
+ontop = 1
+
+
+;----|パワー溜めエフェクト|------------------------------------------------------------------
+
+[state -2, パワー溜めエフェクトの表示]
+type = explod
+trigger1 = stateno = 860 && movetype != H
+trigger1 = numexplod(8600) = 0
+anim = 8600
+ID = 8600
+postype = P1
+pos = 0,0
+facing = 1
+vfacing = 1
+scale = 0.5,0.5
+sprpriority = 4
+ownpal = 1
+
+[state -2, パワー溜めエフェクト高さ指定]
+type = modifyexplod
+trigger1 = numexplod(8600) = 1
+trigger1 = 1
+ID = 8600
+scale = 0.5,ifelse(power <= 300,0.15,0.5*power*0.001)
+
+[state -2, パワー溜めエフェクト消去]
+type = removeexplod
+trigger1 = stateno != 860
+ID = 8600
+
+[state -2, パワー溜め効果音]
+type = playsnd
+trigger1 = stateno = 860 && movetype != H
+trigger1 = time = 10
+value = 850,0
+channel = 1
+
+[state -2, パワー溜め効果音ストップ]
+type = stopsnd
+trigger1 = stateno != 860
+channel = 1
+
+
+;----|ゲージシステム(ノーマルモード)|--------------------------------------------------------
+
+[state -2, POW.MAX発動]
+type = varset
+triggerall = var(40) = 0
+triggerall = var(20) = 0
+triggerall = roundstate = 2
+trigger1 = power >= 1000
+var(20) = 870
+
+[state -2, POW.MAX発動フラッシュ]
+type = explod
+trigger1 = var(20) = 870
+anim = 8140
+ID = 8140
+postype = P1
+pos = 0,-63
+facing = 1
+vfacing = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 4
+ownpal = 1
+
+[state -2, POW.MAX発動効果音]
+type = playsnd
+trigger1 = var(20) = 870
+value = 850,1
+
+[state -2, POW.MAX中のpower蓄積停止]
+type = powerset
+trigger1 = var(20) > 0
+value = 0
+
+[state -2, POW.MAXカウントダウン]
+type = varadd
+trigger1 = var(20) > 0
+var(20) = -1
+
+
+;----|ゲージセレクト|------------------------------------------------------------------------
+
+[state -2, シングル戦以外はゲージをaggressiveに固定1]
+type = varset
+triggerall = !teammode = single
+trigger1 = 1
+var(40) = 1
+
+[state -2, シングル戦以外はゲージをaggressiveに固定2]
+type = varset
+triggerall = !teammode = single
+trigger1 = 1
+var(41) = 1
+
+[state -2, イントロ継続ヘルパー]
+type = helper
+triggerall = teammode = single
+triggerall = roundsexisted = 0 && roundstate = 0 && time = 0
+trigger1 = var(41) = 0
+helpertype = normal
+name = "intro"
+ID = 9000
+stateno = 9000
+pos = 0,0
+postype = P1
+ownpal = 1
+supermovetime = 999999
+pausemovetime = 999999
+
+[state -2, ゲージセレクト初期値（シングル）]
+type = varset
+triggerall = teammode = single
+triggerall = roundsexisted = 0 && roundstate = 0 && time = 0
+trigger1 = var(41) = 0
+var(40) = random%2
+
+[state -2, セレクト効果音]
+type = playsnd
+triggerall = teammode = single
+triggerall = roundsexisted = 0 && roundstate = 1
+triggerall = var(41) = 0
+trigger1 = var(40) = 0
+trigger1 = command = "down"
+trigger2 = var(40) = 1
+trigger2 = command = "up"
+value = 6000,0
+
+[state -2, ゲージセレクト(normalからaggressive)]
+type = varset
+triggerall = teammode = single
+triggerall = roundsexisted = 0 && roundstate = 1
+triggerall = var(41) = 0
+trigger1 = var(40) = 0
+trigger1 = command = "down"
+var(40) = 1
+
+[state -2, ゲージセレクト(aggressiveからnormal)]
+type = varset
+triggerall = teammode = single
+triggerall = roundsexisted = 0 && roundstate = 1
+triggerall = var(41) = 0
+trigger1 = var(40) = 1
+trigger1 = command = "up" 
+var(40) = 0
+
+[state -2, ゲージセレクト固定効果音]
+type = playsnd
+trigger1 = teammode = single
+trigger1 = roundsexisted = 0 && roundstate = 1
+trigger1 = var(41) = 0
+trigger1 = command = "fwd" || command = "back"
+trigger2 = teammode = single
+trigger2 = roundstate >= 2
+trigger2 = var(41) != 1
+value = 6000,1
+
+[state -2, ゲージセレクト固定]
+type = varset
+trigger1 = teammode = single
+trigger1 = roundsexisted = 0 && roundstate = 1
+trigger1 = command = "fwd" || command = "back"
+trigger2 = teammode = single
+trigger2 = roundstate >= 2
+trigger2 = var(41) != 1
+var(41) = 1
+
+[state -2, ゲージセレクトウィンドウ表示]
+type = explod
+trigger1 = teammode = single
+trigger1 = roundsexisted = 0 && roundstate = 1
+trigger1 = numexplod(6100) = 0
+trigger1 = var(41) = 0
+anim = 6099+teamside
+ID = 6100
+postype = left
+pos = 8+(teamside-1)*304,180
+facing = 1
+vfacing = 1
+bindtime = -1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 5
+ownpal = 1
+ontop = 1
+
+[state -2, ゲージセレクトウィンドウ消去]
+type = removeexplod
+triggerall = numexplod(6100) >= 1
+trigger1 = var(41) = 1
+trigger2 = roundstate >= 2
+ID = 6100
+
+[state -2, ゲージセレクトアイコン"normal"表示]
+type = explod
+trigger1 = teammode = single
+trigger1 = roundsexisted = 0 && roundstate = 1
+trigger1 = numexplod(6102) = 0
+trigger1 = var(40) = 0 && var(41) = 0
+anim = 6101+teamside
+ID = 6102
+postype = left
+pos = 8+(teamside-1)*304,180
+facing = 1
+vfacing = 1
+bindtime = -1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 6
+ownpal = 1
+ontop = 1
+
+[state -2, ゲージセレクトアイコン"normal"消去]
+type = removeexplod
+trigger1 = numexplod(6102) >= 1
+trigger1 = var(40) = 1 || var(41) = 1
+ID = 6102
+
+[state -2, ゲージセレクトアイコン"aggressive"表示]
+type = explod
+trigger1 = teammode = single
+trigger1 = roundsexisted = 0 && roundstate = 1
+trigger1 = numexplod(6104) = 0
+trigger1 = var(40) = 1 && var(41) = 0
+anim = 6103+teamside
+ID = 6104
+postype = left
+pos = 8+(teamside-1)*304,180
+facing = 1
+vfacing = 1
+bindtime = -1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 6
+ownpal = 1
+ontop = 1
+
+[state -2, ゲージセレクトアイコン"aggressive"消去]
+type = removeexplod
+trigger1 = numexplod(6104) >= 1
+trigger1 = var(40) = 0 || var(41) = 1
+ID = 6104
+
+
+;----|ガードクラッシュゲージ|---------------------------------------------------------
+
+;ガードクラッシュゲージ
+[state -2, ガードクラッシュゲージ(枠)表示]
+type = explod
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numexplod(6200) = 0
+trigger1 = roundstate > 1
+anim = 6199+teamside
+ID = 6200
+postype = left
+pos = 177-36*(teamside-1),30
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 6
+ownpal = 1
+ontop = 0
+
+[state -2, ガードクラッシュゲージ(中身)表示]
+type = explod
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numexplod(6210) = 0
+trigger1 = roundstate > 1
+trigger1 = var(25) <= ceil(0.007*enemy,lifemax*enemy,const(data.defence))*0.7
+anim = 6209+teamside
+ID = 6210
+postype = left
+pos = 177-36*(teamside-1),30
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 7
+ownpal = 1
+ontop = 0
+
+[state -2, ガードクラッシュゲージ(中身)消去]
+type = removeexplod
+triggerall = var(3) = 1
+triggerall = numenemy
+triggerall = numexplod(6210) >= 1
+trigger1 = var(25) > ceil(0.007*enemy,lifemax*enemy,const(data.defence))*0.7
+trigger2 = teammode = simul
+ID = 6210
+
+[state -2, ガードクラッシュゲージ(中身)長さ指定]
+type = modifyexplod
+trigger1 = numenemy
+trigger1 = numexplod(6210) = 1
+trigger1 = 1
+ID = 6210
+scale = (100*(ceil(0.007*enemy,lifemax*enemy,const(data.defence))-var(25))/ceil(0.007*enemy,lifemax*enemy,const(data.defence)))*0.005,0.5
+ignorehitpause = 1
+
+[state -2, ガードクラッシュゲージ(点滅)表示]
+type = explod
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+triggerall = var(3) = 1
+triggerall = numexplod(6212) = 0
+trigger1 = roundstate > 1
+trigger1 = var(25) > ceil(0.007*enemy,lifemax*enemy,const(data.defence))*0.7
+anim = 6211+teamside
+ID = 6212
+postype = left
+pos = 177-36*(teamside-1),30
+facing = 1
+vfacing = 1
+bindtime = -1
+supermove = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 8
+ownpal = 1
+ontop = 0
+
+[state -2, ガードクラッシュゲージ(点滅)消去]
+type = removeexplod
+triggerall = var(3) = 1
+triggerall = numenemy
+triggerall = numexplod(6212) >= 1
+trigger1 = var(25) <= ceil(0.007*enemy,lifemax*enemy,const(data.defence))*0.7
+trigger2 = teammode = simul
+ID = 6212
+
+[state -2, ガードクラッシュゲージ(点滅)長さ指定]
+type = modifyexplod
+trigger1 = numenemy
+trigger1 = numexplod(6212) = 1
+trigger1 = 1
+ID = 6212
+scale = ifelse(var(25)>=ceil(0.007*enemy,lifemax*enemy,const(data.defence)),0,(100*(ceil(0.007*enemy,lifemax*enemy,const(data.defence))-var(25))/ceil(0.007*enemy,lifemax*enemy,const(data.defence)))*0.005),0.5
+ignorehitpause = 1
+
+
+
+;----|気絶処理|-----------------------------------------------------------------------
+
+;気絶値リセット
+[state -2, 気絶値リセット用タイマーセット]
+type = varset
+triggerall = var(2) = 1
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+trigger1 = movecontact
+trigger2 = numhelper(7200)
+trigger2 = helper(7200),var(26) = 1
+var(23) = 180
+
+[state -2, 気絶値リセット用タイマー]
+type = varadd
+triggerall = var(23) > 0
+trigger1 = P2movetype != H
+var(23) = -1
+
+[state -2, 気絶値リセット]
+type = varset
+triggerall = var(22) != 0
+trigger1 = var(23) = 0
+trigger2 = (P2stateno = [5296,5300]) && P2movetype = H
+trigger3 = var(2) = 0
+var(22) = 0
+
+[state -2, 気絶回数カウント]
+type = varadd
+trigger1 = numenemy
+trigger1 = P2stateno = 5296 && P2movetype = H && enemy,time = 1
+var(24) = 1
+
+[state -2, 気絶吹き飛びSE]
+type = playsnd
+trigger1 = numenemy
+trigger1 = P2stateno = 5296 && P2movetype = H
+trigger1 = enemy,anim = 5030 && enemy,animelemtime(1) = 2
+ignorehitpause = 1
+value = 5300,1
+
+[state -2, 朦朧状態SE]
+type = playsnd
+trigger1 = numenemy
+trigger1 = P2stateno = 5300 && P2movetype = H
+trigger1 = enemy,time = 1
+value = 5300,0
+
+[state -2, 朦朧エフェクト(星)]
+type = explod
+trigger1 = numenemy
+trigger1 = P2stateno = 5296 && P2movetype = H
+trigger1 = enemy,anim = 5030 && enemy,animelemtime(1) = 2
+anim = 8150
+ID = 8150
+postype = P2
+pos = 0,const(size.head.pos.Y)-20
+facing = -1
+vfacing = 1
+removetime = -1
+bindtime = -1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 4
+ownpal = 1
+
+[state -2, 朦朧エフェクト消去]
+type = removeexplod
+trigger1 = P2movetype != H
+trigger2 = P2stateno != [5296,5300]
+ID = 8150
+
+[state -2, 朦朧状態持続時間]
+type = varset
+triggerall = P2stateno = 5300 && P2movetype = H
+trigger1 = var(21) <= 0
+var(21) = 120+(random%4*60)
+
+[state -2, 朦朧状態カウントダウン]
+type = varadd
+trigger1 = var(21) > 0
+var(21) = -1
+
+[state -2, ボタン連打受付]
+type = varadd
+triggerall = numenemy
+triggerall = P2stateno = 5300 && P2movetype = H
+trigger1 = enemy,command = "x" || enemy,command = "y" || enemy,command = "z"
+trigger2 = enemy,command = "a" || enemy,command = "b" || enemy,command = "c"
+trigger3 = enemy,command = "x+y" || enemy,command = "y+z" || enemy,command = "x+z"
+trigger4 = enemy,command = "a+b" || enemy,command = "b+c" || enemy,command = "a+c"
+trigger5 = enemy,command = "recovery" || enemy,command = "y+b" || enemy,command = "z+c"
+var(21) = -2
+
+[state -2, レバガチャ受付(相手)]
+type = varadd
+triggerall = numenemy
+triggerall = P2stateno = 5300 && P2movetype = H
+trigger1 = enemy,command = "fwd" || enemy,command = "back" || enemy,command = "up" || enemy,command = "down"
+trigger2 = enemy,command = "fwddown" || enemy,command = "backdown" || enemy,command = "fwdup" || enemy,command = "backup"
+var(21) = -1
+
+[state -2, 朦朧状態持続時間リセット]
+type = varset
+trigger1 = P2movetype != H
+trigger2 = P2stateno != [5296,5300]
+var(21) = 0
+
+
+;----|ガードクラッシュ処理|---------------------------------------------------------------
+
+;ガードクラッシュ値回復タイマー
+[state -2, ガードクラッシュ値回復用タイマーセット]
+type = varset
+triggerall = var(3) = 1
+triggerall = numenemy
+triggerall = enemy,teammode = single || enemy,teammode = turns
+triggerall = !teammode = simul
+trigger1 = movecontact
+trigger2 = numhelper(7200)
+trigger2 = helper(7200),var(26) = 1
+var(26) = 180
+
+[state -2, ガードクラッシュ値回復用タイマー]
+type = varadd
+triggerall = var(26) > 0
+trigger1 = P2movetype != H
+var(26) = -1
+
+[state -2, ガードクラッシュ値回復]
+type = varadd
+triggerall = var(26) = 0
+trigger1 = var(25) > 0
+var(25) = -1
+
+[state -2, ガードクラッシュ値リセット]
+type = varset
+triggerall = var(25) != 0
+trigger1 = var(3) = 0
+trigger2 = (P2stateno = [5910,5930]) && P2movetype = H
+trigger3 = numenemy
+trigger3 = (enemy,prevstateno = [5910,5930]) && P2movetype = H
+var(25) = 0
+
+[state -2, ガードクラッシュSE]
+type = playsnd
+triggerall = numenemy
+triggerall = P2movetype = H
+triggerall = P2stateno = 5910 || P2stateno = 5920 || P2stateno = 5930
+trigger1 = enemy,time = 2
+ignorehitpause = 1
+value = 5910,0
+
+[state -2, ガードクラッシュエフェクト]
+type = explod
+triggerall = numenemy
+triggerall = P2movetype = H
+triggerall = P2stateno = 5910 || P2stateno = 5920 || P2stateno = 5930
+trigger1 = enemy,time = 2
+ignorehitpause = 1
+anim = 8110
+ID = 8110
+postype = P2
+bindtime = -1
+pos = 20,enemy,const(size.head.pos.Y)
+facing = -1
+vfacing = 1
+pausemovetime = -1
+scale = 0.5,0.5
+sprpriority = 4
+ownpal = 1
+
+
+;----|ブラッシュアウト飛び道具反射用ヘルパー|----------------------------------------------
+
+[state -2, 常駐ヘルパー発生]
+type = helper
+triggerall = roundstate = 2
+trigger1 = numhelper(7200) = 0
+helpertype = normal
+name = "brushout"
+ID = 7200
+stateno = 7200
+pos = 0,0
+postype = P1
+ownpal = 1
+supermovetime = 999999
+pausemovetime = 999999
+
+
+;----|不要な残像を消す|--------------------------------------------------------------------
+
+[state -2, やられ状態時に残像を消す]
+type = afterimagetime
+trigger1 = movetype = H
+time = 0
+
+;----|飛び道具のパワー取得|------------------------------------------------------------------------------
+
+[state -2, 飛び道具(ブラッシュアウト撃ち返し弾)ヒット時のパワー取得]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = numhelper(7300)
+trigger1 = helper(7300),movehit = 1
+value = 80
+
+[state -2, 飛び道具(ブラッシュアウト撃ち返し弾)ガード時のパワー取得]
+type = poweradd
+trigger1 = var(40) = 1
+trigger1 = numhelper(7300)
+trigger1 = helper(7300),moveguarded = 1
+value = 30
+
+
+
+
+
