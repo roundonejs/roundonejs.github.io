@@ -43,7 +43,7 @@ var player = require('player');
 var canvasWidth = 720;
 var canvasHeight = 540;
 
-app.loadCharacters(
+app.MugenJSApp.loadCharacters(
     [
         {
             'path': 'chars',
@@ -71,7 +71,14 @@ app.loadCharacters(
         player2.palette = player2.SFF.palette;
         player2.right = -1;
 
-        app.init(player1, player2, canvasWidth, canvasHeight, 1);
+        mugenjs = new app.MugenJSApp(
+            player1,
+            player2,
+            canvasWidth,
+            canvasHeight,
+            1
+        );
+        mugenjs.init();
     }
 );
 ```
