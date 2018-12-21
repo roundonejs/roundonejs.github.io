@@ -18,10 +18,10 @@ iframe {
 }
 
 .github-link > p.balloon {
-  align-self: flex-start;
-  padding: 0.2rem 0.5rem;
+    align-self: flex-start;
+    padding: 0.2rem 0.5rem;
 }
 
 .github-link > i.octocat {
-  align-self: flex-end;
+    align-self: flex-end;
 }
