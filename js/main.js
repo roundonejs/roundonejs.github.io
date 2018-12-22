@@ -59,9 +59,11 @@ app.MugenJSApp.loadCharacters(
             'E': 'z'
         });
         document.addEventListener('keydown', function(event) {
+            event.preventDefault();
             control1.keyEvent(event);
         });
         document.addEventListener('keyup', function(event) {
+            event.preventDefault();
             control1.keyEvent(event);
         });
 
