@@ -25,3 +25,7 @@ iframe {
 .github-link > i.octocat {
     align-self: flex-end;
 }
+
+a {
+    color: #004ea2;
+}
