@@ -1,8 +1,8 @@
-# MugenJS
+# RoundOne.js
 
 This project use mugen's files format in JavaScript (DEF, AIR, SFF and ACT files) to display and animate into canvas.
 
-![Capture of MugenJS](https://mugenjs.github.io/images/mugenjs.png)
+![Capture of RoundOne.js](https://roundonejs.github.io/images/roundonejs.png)
 
 ## About M.U.G.E.N.
 
@@ -30,20 +30,20 @@ Palette files (.act) are the 256 colour data files that determine what colours g
 
 1. [Install Node.js](https://nodejs.org/en/download/package-manager/);
 2. [Install the dependencies](https://docs.npmjs.com/cli/install);
-3. [Download the mugenjs repository](https://github.com/mugenjs/mugenjs);
+3. [Download the RoundOne.js repository](https://github.com/roundonejs/roundonejs);
 4. [Run grunt](https://gruntjs.com/getting-started) without arguments;
-5. Import `dist/mugen.js` file on page;
+5. Import `dist/roundone.js` file on page;
 ```html
-<script type="text/javascript" src="mugen.js"></script>
+<script type="text/javascript" src="roundone.js"></script>
 ```
-6. Load characters and init **mugen.js**;
+6. Load characters and init **roundone.js**;
 ```js
 var app = require('app');
 var player = require('player');
 var canvasWidth = 720;
 var canvasHeight = 540;
 
-app.MugenJSApp.loadCharacters(
+app.RoundOneJSApp.loadCharacters(
     [
         {
             'path': 'chars',
@@ -71,14 +71,14 @@ app.MugenJSApp.loadCharacters(
         player2.palette = player2.SFF.palette;
         player2.right = -1;
 
-        mugenjs = new app.MugenJSApp(
+        roundonejs = new app.RoundOneJSApp(
             player1,
             player2,
             canvasWidth,
             canvasHeight,
             1
         );
-        mugenjs.init();
+        roundonejs.init();
     }
 );
 ```

@@ -8,7 +8,7 @@ var canvasHeight = 540;
 var character;
 var player;
 
-app.MugenJSApp.loadCharacters(
+app.RoundOneJSApp.loadCharacters(
     [
         {
             'path': 'chars',
@@ -67,13 +67,13 @@ app.MugenJSApp.loadCharacters(
             control1.keyEvent(event);
         });
 
-        mugenjs = new app.MugenJSApp(
+        roundonejs = new app.RoundOneJSApp(
             player1,
             player2,
             canvasWidth,
             canvasHeight,
             1
         );
-        mugenjs.init();
+        roundonejs.init();
     }
 );
